@@ -1,0 +1,8 @@
+[submodule "tests/yaml-test-suite"]
+	path = tests/yaml-test-suite
+	url = https://github.com/yaml/yaml-test-suite.git
+	branch = master
+[submodule "tests/testml"]
+	path = tests/testml
+	url = https://github.com/testml-lang/testml.git
+	branch = master
