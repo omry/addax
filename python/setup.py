@@ -1,9 +1,17 @@
-import setuptools
+"""
+Elk python setup.py
+"""
+import setuptools.command.build_py
+
+from setup import PylintCommand
 
 with open("README.md", "r") as fh:
     LONG_DESC = fh.read()
     setuptools.setup(
-        name="elk2",
+        cmdclass={
+            'pylint': PylintCommand,
+        },
+        name="elk",
         version="0.1",
         author="Omry Yadan",
         author_email="omry@yadan.net",
@@ -14,7 +22,7 @@ with open("README.md", "r") as fh:
         tests_require=["pytest"],
         url="https://github.com/omry/elk",
         keywords='yaml parser',
-        packages=['elk2'],
+        packages=['elk'],
         classifiers=[
             "Programming Language :: Python :: 2.7",
             "Programming Language :: Python :: 3.5",
