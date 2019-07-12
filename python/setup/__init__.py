@@ -1,5 +1,6 @@
 """
 setup utilities
 """
-from .pylint_command import PylintCommand
 from .antlr_command import ANTLRCommand
+from .buildpy_command import BuildPyCommand
+
