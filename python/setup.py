@@ -3,13 +3,14 @@ Elk python setup.py
 """
 import setuptools.command.build_py
 
-from setup import PylintCommand
+from setup import PylintCommand, ANTLRCommand
 
 with open("README.md", "r") as fh:
     LONG_DESC = fh.read()
     setuptools.setup(
         cmdclass={
             'pylint': PylintCommand,
+            'antlr': ANTLRCommand,
         },
         name="elk",
         version="0.1",
