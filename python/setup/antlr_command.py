@@ -3,8 +3,8 @@ ANTLR compiler invocation
 """
 import distutils.cmd
 import distutils.log
-import os
 import subprocess
+import sys
 
 
 class ANTLRCommand(distutils.cmd.Command):
@@ -15,26 +15,26 @@ class ANTLRCommand(distutils.cmd.Command):
         # ('pylint-rcfile=', None, 'path to Pylint config file'),
     ]
 
-    def __init__(self):
-        super(ANTLRCommand, self).__init__()
-        self.grammar_files = None
+    def __init__(self, dist):
+        super(ANTLRCommand, self).__init__(dist)
+        self.grammar_file = None
 
     def initialize_options(self):
         """Set default values for options."""
         # Each user option must be listed here with their default value.
-        self.grammar_files = ['../grammaer/YAML.g4']
+        self.grammar_file = '../grammar/YAML.g4'
 
     def finalize_options(self):
-        """Post-process options."""
-        if self.grammar_files:
-            for file_ in self.grammar_files:
-                assert os.path.exists(file_), \
-                    'Pylint config file {} does not exist.'.format(self.pylint_rcfile)
+        pass
 
     def run(self):
         """Run command."""
         command = ['antlr4']
-        command.append(os.getcwd())
+        if sys.version_info >= (3, 0):
+            command.extend(['-Dlanguage=Python3', '-o', 'elk/gen3'])
+        else:
+            command.extend(['-Dlanguage=Python2', '-o', 'elk/gen2'])
+        command.extend(['-Xexact-output-dir', '../grammar/YAML.g4'])
         self.announce(
             'Running command: %s' % str(command),
             level=distutils.log.INFO)
