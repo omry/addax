@@ -6,6 +6,16 @@ import subprocess
 
 import setuptools.command.build_py
 
+"""
+Addax setup
+    Instructions:
+    # Build:
+    rm -rf dist/ addax.egg-info/
+    python3 setup.py sdist bdist_wheel
+    # Upload:
+    python3 -m twine upload dist/*
+"""
+
 
 class ANTLRCommand(distutils.cmd.Command):
     """Generate parsers using ANTLR."""
