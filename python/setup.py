@@ -8,6 +8,7 @@ import sys
 import re
 import setuptools.command.build_py
 import shutil
+from os import path
 
 """
 Addax setup
@@ -35,14 +36,15 @@ class ANTLRCommand(distutils.cmd.Command):
 
     def run(self):
         """Run command."""
+        root_dir = path.dirname(path.realpath(__file__))
         for pyver in (2, 3):
             command = [sys.executable,
-                       '../bin/antlr4.py',
+                       path.join(root_dir, 'bin/antlr4.py'),
                        '-Dlanguage=Python{}'.format(pyver),
                        '-o',
                        'addax/gen{}'.format(pyver),
                        '-Xexact-output-dir',
-                       'grammar/YAML.g4']
+                       path.join(root_dir, 'grammar/YAML.g4')]
             self.announce('Generating parser for Python {}: {}'.format(pyver, command), level=distutils.log.INFO)
             subprocess.check_call(command)
 
@@ -74,7 +76,7 @@ class CleanCommand(distutils.cmd.Command):
         for parent, dirs, files in os.walk(root):
             for f in dirs + files:
                 if re.findall(pattern, f):
-                    res.append(os.path.join(parent, f))
+                    res.append(path.join(parent, f))
         return res
 
     def run(self):
@@ -92,8 +94,8 @@ class CleanCommand(distutils.cmd.Command):
             deletion_list.extend(self.find(gen, 'YAML.*'))
 
         for f in deletion_list:
-            if os.path.exists(f):
-                if os.path.isdir(f):
+            if path.exists(f):
+                if path.isdir(f):
                     shutil.rmtree(f, ignore_errors=True)
                 else:
                     os.unlink(f)
