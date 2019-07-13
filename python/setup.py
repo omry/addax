@@ -87,6 +87,7 @@ class CleanCommand(distutils.cmd.Command):
             '.pytest_cache',
             'addax.egg-info',
             'build',
+            'dist',
         ]
         for p in ['__pycache__', re.escape('.pyc')]:
             deletion_list.extend(self.find('.', p))
