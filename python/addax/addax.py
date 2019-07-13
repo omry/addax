@@ -4,7 +4,7 @@ from . import YAMLLexer
 from . import YAMLParser
 
 
-class Elk(object):
+class Addax(object):
     def __init__(self, s):
         istream = InputStream(s)
         lexer = YAMLLexer(istream)

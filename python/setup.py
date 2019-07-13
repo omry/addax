@@ -26,7 +26,7 @@ class ANTLRCommand(distutils.cmd.Command):
             command = ['antlr4',
                        '-Dlanguage=Python{}'.format(pyver),
                        '-o',
-                       'yamelk/gen{}'.format(pyver),
+                       'addax/gen{}'.format(pyver),
                        '-Xexact-output-dir',
                        'grammar/YAML.g4']
             self.announce('Generating parser for Python {}: {}'.format(pyver, command), level=distutils.log.INFO)
@@ -49,7 +49,7 @@ with open("README.md", "r") as fh:
             'antlr': ANTLRCommand,
             'build_py': BuildPyCommand,
         },
-        name="yamelk",
+        name="addax",
         version="0.1",
         author="Omry Yadan",
         author_email="omry@yadan.net",
@@ -58,9 +58,9 @@ with open("README.md", "r") as fh:
         long_description_content_type="text/markdown",
         setup_requires=["pytest-runner"],
         tests_require=["pytest"],
-        url="https://github.com/omry/elk",
+        url="https://github.com/omry/addax",
         keywords='yaml parser',
-        packages=['yamelk'],
+        packages=['addax'],
         include_package_data=True,
         classifiers=[
             "Programming Language :: Python :: 2.7",

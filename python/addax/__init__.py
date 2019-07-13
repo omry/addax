@@ -9,4 +9,4 @@ else:
     from .gen2 import YAMLLexer
     from .gen2 import YAMLParser
 
-from .elk import Elk
+from .addax import Addax
