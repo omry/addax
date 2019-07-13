@@ -1,0 +1,12 @@
+[run]
+omit =
+    addax/gen2/YAML*
+    addax/gen3/YAML*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+    raise TypeError

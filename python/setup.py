@@ -2,9 +2,12 @@
 
 import distutils.cmd
 import distutils.log
+import os
 import subprocess
-
+import sys
+import re
 import setuptools.command.build_py
+import shutil
 
 """
 Addax setup
@@ -33,7 +36,8 @@ class ANTLRCommand(distutils.cmd.Command):
     def run(self):
         """Run command."""
         for pyver in (2, 3):
-            command = ['antlr4',
+            command = [sys.executable,
+                       '../bin/antlr4.py',
                        '-Dlanguage=Python{}'.format(pyver),
                        '-o',
                        'addax/gen{}'.format(pyver),
@@ -52,11 +56,55 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
         setuptools.command.build_py.build_py.run(self)
 
 
+class CleanCommand(distutils.cmd.Command):
+    """
+    Our custom command to clean out junk files.
+    """
+    description = "Cleans out junk files we don't want in the repo"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def find(self, root, pattern):
+        res = []
+        for parent, dirs, files in os.walk(root):
+            for f in dirs + files:
+                if re.findall(pattern, f):
+                    res.append(os.path.join(parent, f))
+        return res
+
+    def run(self):
+        deletion_list = [
+            '.coverage',
+            '.eggs',
+            '.tox',
+            '.pytest_cache',
+            'addax.egg-info',
+            'build',
+        ]
+        for p in ['__pycache__', re.escape('.pyc')]:
+            deletion_list.extend(self.find('.', p))
+        for gen in ['addax/gen2', 'addax/gen3']:
+            deletion_list.extend(self.find(gen, 'YAML.*'))
+
+        for f in deletion_list:
+            if os.path.exists(f):
+                if os.path.isdir(f):
+                    shutil.rmtree(f, ignore_errors=True)
+                else:
+                    os.unlink(f)
+
+
 with open("README.md", "r") as fh:
     LONG_DESC = fh.read()
     setuptools.setup(
         cmdclass={
             'antlr': ANTLRCommand,
+            'clean_all': CleanCommand,
             'build_py': BuildPyCommand,
         },
         name="addax",

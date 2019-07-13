@@ -2,3 +2,5 @@ build
 dist
 .eggs
 addax.egg-info
+.coveralls.yml
+.tox
