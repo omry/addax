@@ -1,0 +1,11 @@
+language: python
+python: 2.7
+install: pip install tox
+matrix:
+    include:
+      - language: python
+        python: 2.7
+        env: TOXENV=py27
+        before_install:
+          - cd python
+        script: tox
