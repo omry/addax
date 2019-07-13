@@ -26,7 +26,7 @@ class ANTLRCommand(distutils.cmd.Command):
             command = ['antlr4',
                        '-Dlanguage=Python{}'.format(pyver),
                        '-o',
-                       'elk/gen{}'.format(pyver),
+                       'yamelk/gen{}'.format(pyver),
                        '-Xexact-output-dir',
                        'grammar/YAML.g4']
             self.announce('Generating parser for Python {}: {}'.format(pyver, command), level=distutils.log.INFO)
@@ -49,7 +49,7 @@ with open("README.md", "r") as fh:
             'antlr': ANTLRCommand,
             'build_py': BuildPyCommand,
         },
-        name="elk",
+        name="yamelk",
         version="0.1",
         author="Omry Yadan",
         author_email="omry@yadan.net",
@@ -60,14 +60,14 @@ with open("README.md", "r") as fh:
         tests_require=["pytest"],
         url="https://github.com/omry/elk",
         keywords='yaml parser',
-        packages=['elk'],
+        packages=['yamelk'],
         include_package_data=True,
         classifiers=[
             "Programming Language :: Python :: 2.7",
             "Programming Language :: Python :: 3.5",
             "Programming Language :: Python :: 3.6",
             "Programming Language :: Python :: 3.7",
-            "License :: OSI Approved :: BSD License",
+            "License :: OSI Approved :: MIT License",
             "Operating System :: OS Independent",
         ],
         install_requires=[

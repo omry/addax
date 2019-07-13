@@ -1,4 +1,4 @@
-from elk import Elk
+from yamelk import Elk
 
 
 def test_basic():
@@ -17,4 +17,4 @@ def test_basic():
 #
 # @pytest.mark.parametrize('test_name,file', get_test_files())
 # def test_foo(test_name, file):
-#     elk = Elk(file)
+#     yamelk = Elk(file)
