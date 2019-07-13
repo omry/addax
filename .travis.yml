@@ -7,7 +7,7 @@ addons:
 matrix:
     include:
       - language: python
-        dist: xenial
+        dist: bionic
         python: 2.7
         env: TOXENV=py27
         before_install:
