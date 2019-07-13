@@ -1,26 +1,20 @@
 language: python
 python: 2.7
 install: pip install tox
-addons:
-  apt:
-    update: true
-
 dist: bionic
 
 matrix:
-    include:
-      - language: python
-        python: 2.7
-        env: TOXENV=py27
-        before_install:
-          - sudo apt-get install -y antlr4.py
-          - cd python
-        script: tox
+  include:
+    - language: python
+      python: 2.7
+      env: TOXENV=py27
+      before_install:
+        - cd python
+      script: tox
 
-      - language: python
-        python: 3.6
-        env: TOXENV=py36
-        before_install:
-          - sudo apt-get install -y antlr4.py
-          - cd python
-        script: tox
+    - language: python
+      python: 3.6
+      env: TOXENV=py36
+      before_install:
+        - cd python
+      script: tox
