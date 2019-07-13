@@ -1,8 +1,6 @@
 language: python
 python: 2.7
 install: pip install tox
-before_install:
-  - sudo apt-get install -y antlr4
 addons:
   apt:
     update: true
@@ -12,5 +10,6 @@ matrix:
         python: 2.7
         env: TOXENV=py27
         before_install:
+          - sudo apt-get install -y antlr4
           - cd python
         script: tox
