@@ -1,11 +1,46 @@
 #!/usr/bin/env python
 
-"""
-Elk python setup.py
-"""
+import distutils.cmd
+import distutils.log
+import subprocess
+
 import setuptools.command.build_py
 
-from setup import ANTLRCommand, BuildPyCommand
+
+class ANTLRCommand(distutils.cmd.Command):
+    """Generate parsers using ANTLR."""
+
+    description = 'Run ANTLR'
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        """Run command."""
+        for pyver in (2, 3):
+            command = ['antlr4',
+                       '-Dlanguage=Python{}'.format(pyver),
+                       '-o',
+                       'elk/gen{}'.format(pyver),
+                       '-Xexact-output-dir',
+                       'grammar/YAML.g4']
+            self.announce('Generating parser for Python {}: {}'.format(pyver, command), level=distutils.log.INFO)
+            subprocess.check_call(command)
+
+
+class BuildPyCommand(setuptools.command.build_py.build_py):
+    """Custom build command."""
+
+    def run(self):
+        if not self.dry_run:
+            self.run_command('antlr')
+        setuptools.command.build_py.build_py.run(self)
+
 
 with open("README.md", "r") as fh:
     LONG_DESC = fh.read()
@@ -26,6 +61,7 @@ with open("README.md", "r") as fh:
         url="https://github.com/omry/elk",
         keywords='yaml parser',
         packages=['elk'],
+        include_package_data=True,
         classifiers=[
             "Programming Language :: Python :: 2.7",
             "Programming Language :: Python :: 3.5",
