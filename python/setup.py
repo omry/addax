@@ -134,5 +134,15 @@ with open("README.md", "r") as fh:
         install_requires=[
             'antlr4-python3-runtime;python_version>="3.0"',
             'antlr4-python2-runtime;python_version<"3.0"',
-        ]
-    )
+            ],
+        # Install development dependencies with 
+        # pip install -e .[dev]
+        extras_require={
+            'dev': [
+                'pytest',
+                'tox',
+                'coveralls'
+                ]
+            }
+
+        )
