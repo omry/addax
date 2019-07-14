@@ -54,16 +54,16 @@ class ANTLRCommand(distutils.cmd.Command):
             """
             copied_bin = False
             copied_grammar = False
-            if not exists('bin'):
+            if exists('../bin'):
                 dir_util.copy_tree('../bin', 'bin')
                 copied_bin = True
-            if not exists('grammar'):
+            if exists('../grammar'):
                 dir_util.copy_tree('../grammar', 'grammar')
                 copied_grammar = True
 
             for pyver in (2, 3):
                 command = [sys.executable,
-                           join(root_dir, 'bin/antlr4.py'),
+                           join(root_dir, 'bin/antlr4'),
                            '-Dlanguage=Python{}'.format(pyver),
                            '-o',
                            'antelope/gen{}'.format(pyver),
@@ -75,7 +75,7 @@ class ANTLRCommand(distutils.cmd.Command):
             if copied_bin:
                 shutil.rmtree('bin', ignore_errors=True)
             if copied_grammar:
-                shutil.rmtree('grammaer', ignore_errors=True)
+                shutil.rmtree('grammar', ignore_errors=True)
 
 
 class BuildPyCommand(setuptools.command.build_py.build_py):
