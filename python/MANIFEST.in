@@ -1,5 +1,3 @@
-include grammar/*
-include bin/*
 recursive-include addax/gen2 *
 recursive-include addax/gen3 *
 
