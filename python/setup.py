@@ -190,7 +190,8 @@ with open("README.md", "r") as fh:
             'dev': [
                 'pytest',
                 'tox',
-                'coveralls'
+                'coveralls',
+                'twine',
             ]
         }
 
