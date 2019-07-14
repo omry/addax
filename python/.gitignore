@@ -4,3 +4,5 @@ dist
 addax.egg-info
 .coveralls.yml
 .tox
+grammar
+bin
