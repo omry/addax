@@ -1,10 +1,10 @@
-from addax import Addax
+from antelope import Antelope
 
 
 def test_basic():
     s = "{99, 3, 451}"
-    addax = Addax(s)
-    print(addax)
+    antelope = Antelope(s)
+    print(antelope)
 
 # def get_test_files():
 #     return [

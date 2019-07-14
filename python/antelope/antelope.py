@@ -4,7 +4,7 @@ from . import YAMLLexer
 from . import YAMLParser
 
 
-class Addax(object):
+class Antelope(object):
     def __init__(self, s):
         istream = InputStream(s)
         lexer = YAMLLexer(istream)

@@ -1,7 +1,7 @@
 build
 dist
 .eggs
-addax.egg-info
+antelope.egg-info
 .coveralls.yml
 .tox
 grammar

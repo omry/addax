@@ -1,7 +1,7 @@
 [run]
 omit =
-    addax/gen2/YAML*
-    addax/gen3/YAML*
+    antelope/gen2/YAML*
+    antelope/gen3/YAML*
 
 [report]
 exclude_lines =

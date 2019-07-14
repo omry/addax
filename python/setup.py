@@ -14,7 +14,7 @@ import shutil
 import subprocess
 
 """
-Addax setup
+Antelope setup
     Instructions:
     # build
     python setup.py clean_all sdist bdist_wheel
@@ -66,7 +66,7 @@ class ANTLRCommand(distutils.cmd.Command):
                            join(root_dir, 'bin/antlr4.py'),
                            '-Dlanguage=Python{}'.format(pyver),
                            '-o',
-                           'addax/gen{}'.format(pyver),
+                           'antelope/gen{}'.format(pyver),
                            '-Xexact-output-dir',
                            join(root_dir, 'grammar/YAML.g4')]
                 self.announce('Generating parser for Python {}: {}'.format(pyver, command), level=distutils.log.INFO)
@@ -130,7 +130,7 @@ class CleanCommand(distutils.cmd.Command):
             '.eggs',
             '.tox',
             '.pytest_cache',
-            'addax.egg-info',
+            'antelope.egg-info',
             'build',
             'dist',
             # copied by antlr command hack
@@ -139,7 +139,7 @@ class CleanCommand(distutils.cmd.Command):
         ]
         for p in ['__pycache__', re.escape('.pyc')]:
             deletion_list.extend(self.find('.', p))
-        for gen in ['addax/gen2', 'addax/gen3']:
+        for gen in ['antelope/gen2', 'antelope/gen3']:
             deletion_list.extend(self.find(gen, 'YAML.*'))
 
         for f in deletion_list:
@@ -159,7 +159,7 @@ with open("README.md", "r") as fh:
             'sdist': SDistCommand,
             'build_py': BuildPyCommand,
         },
-        name="addax",
+        name="antelope",
         version="0.1",
         author="Omry Yadan",
         author_email="omry@yadan.net",
@@ -168,9 +168,9 @@ with open("README.md", "r") as fh:
         long_description_content_type="text/markdown",
         setup_requires=["pytest-runner"],
         tests_require=["pytest"],
-        url="https://github.com/omry/addax",
+        url="https://github.com/omry/antelope",
         keywords='yaml parser',
-        packages=['addax'],
+        packages=['antelope'],
         include_package_data=True,
         classifiers=[
             "Programming Language :: Python :: 2.7",
