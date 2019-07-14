@@ -91,6 +91,8 @@ class SDistCommand(setuptools.command.sdist.sdist):
     """Custom build command."""
 
     def run(self):
+        if not self.dry_run:
+            self.run_command('antlr')
         setuptools.command.sdist.sdist.run(self)
 
     def make_release_tree(self, base_dir, files):
