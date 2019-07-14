@@ -1,6 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/antelope.svg)](https://badge.fury.io/py/antelope)
 [![Build Status](https://travis-ci.com/omry/antelope.svg?branch=master)](https://travis-ci.com/omry/antelope)
 [![downloads](https://img.shields.io/pypi/dm/antelope.svg)](https://pypistats.org/packages/antelope)
+[![Coverage Status](https://coveralls.io/repos/github/omry/antelope/badge.svg)](https://coveralls.io/github/omry/antelope)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/antelope.svg)
 
 # Antelope
