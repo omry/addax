@@ -91,10 +91,10 @@ class SDistCommand(setuptools.command.sdist.sdist):
     """Custom build command."""
 
     def run(self):
-        super(SDistCommand, self).run()
+        setuptools.command.sdist.sdist.run(self)
 
     def make_release_tree(self, base_dir, files):
-        super(SDistCommand, self).make_release_tree(base_dir, files)
+        setuptools.command.sdist.sdist.make_release_tree(self, base_dir, files)
         # sdist can't handle files outside of the root dir of the build.
         # a little hack to help it.
         self.copy_tree("../bin", join(base_dir, 'bin'))
