@@ -1,11 +1,9 @@
-language: python
-python: 2.7
-install: pip install tox
 dist: bionic
 
 matrix:
   include:
     - language: python
+      install: pip install tox
       python: 2.7
       env: TOXENV=py27
       before_install:
@@ -13,8 +11,25 @@ matrix:
       script: tox
 
     - language: python
+      install: pip install tox
+      python: 3.5
+      env: TOXENV=py35
+      before_install:
+        - cd python
+      script: tox
+
+    - language: python
+      install: pip install tox
       python: 3.6
       env: TOXENV=py36
+      before_install:
+        - cd python
+      script: tox
+
+    - language: python
+      install: pip install tox
+      python: 3.7
+      env: TOXENV=py37
       before_install:
         - cd python
       script: tox
