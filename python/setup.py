@@ -90,9 +90,6 @@ class BuildPyCommand(setuptools.command.build_py.build_py):
 class SDistCommand(setuptools.command.sdist.sdist):
     """Custom build command."""
 
-    def __init__(self, dist):
-        super(SDistCommand, self).__init__(dist)
-
     def run(self):
         super(SDistCommand, self).run()
 
