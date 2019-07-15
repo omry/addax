@@ -21,14 +21,12 @@ from antelope.yaml_input_stream import StringInputStream
 
 
 @pytest.mark.parametrize('bom,encoding', [
-    # no bom, ascii input
-
-    ('\xef\xbb\xbf', None),
-    ('\xef\xbb\xbf', 'utf-8'),
-    ('\xfe\xff', 'utf-16-be'),
-    ('\xff\xfe', 'utf-16-le'),
-    ('\x00\x00\xfe\xff', 'utf-32-be'),
-    ('\xff\xfe\x00\x00', 'utf-32-le'),
+    (b'\xef\xbb\xbf', None),
+    (b'\xef\xbb\xbf', 'utf-8'),
+    (b'\xfe\xff', 'utf-16-be'),
+    (b'\xff\xfe', 'utf-16-le'),
+    (b'\x00\x00\xfe\xff', 'utf-32-be'),
+    (b'\xff\xfe\x00\x00', 'utf-32-le'),
 
     (None, None),
     (None, 'utf-8'),
@@ -46,7 +44,7 @@ def test_string_input_stream(bom, encoding):
     bom_len = 0
     if bom is not None:
         s = bom + s
-        bom_len = 1
+        bom_len = len(bom)
     stream = StringInputStream(s)
     assert stream.index == 0
     assert stream.size == len(input_str) + bom_len
@@ -65,11 +63,11 @@ def test_string_input_stream(bom, encoding):
 
 
 @pytest.mark.parametrize('bom_str,token', [
-    ('\xef\xbb\xbf', YAMLLexer.BOM_UTF8),
-    ('\xfe\xff', YAMLLexer.BOM_UTF16_BE),
-    ('\xff\xfe', YAMLLexer.BOM_UTF16_LE),
-    ('\x00\x00\xfe\xff', YAMLLexer.BOM_UTF32_BE),
-    ('\xff\xfe\x00\x00', YAMLLexer.BOM_UTF32_LE),
+    (b'\xef\xbb\xbf', YAMLLexer.BOM_UTF8),
+    (b'\xfe\xff', YAMLLexer.BOM_UTF16_BE),
+    (b'\xff\xfe', YAMLLexer.BOM_UTF16_LE),
+    (b'\x00\x00\xfe\xff', YAMLLexer.BOM_UTF32_BE),
+    (b'\xff\xfe\x00\x00', YAMLLexer.BOM_UTF32_LE),
 ])
 def test_lexer_bom(bom_str, token):
     inp = StringInputStream(bom_str)
@@ -77,4 +75,3 @@ def test_lexer_bom(bom_str, token):
     tokens = lexer.getAllTokens()
     assert len(tokens) == 1
     assert tokens[0].type == token
-    # assert ','.join(["{}={}".format(lexer.ruleNames[t.type - 1], t.text) for t in tokens]) == tokens_str

@@ -4,18 +4,19 @@ import six
 # Use of this file is governed by the BSD 3-clause license that
 # can be found in the LICENSE.txt file in the project root.
 #
-import unittest
 
 #
 #  Vacuum all input from a string and then treat it like a buffer.
 #
 from antlr4.Token import Token
-from antlr4.CodePoints import to_unicode
+
+if six.PY2:
+    from antlr4.CodePoints import to_unicode
 
 
 class StringInputStream(object):
 
-    def __init__(self, d):
+    def __init__(self, input_str):
         self.name = "<empty>"
         """
                                     Byte0    Byte1   Byte2   Byte3   Encoding
@@ -30,46 +31,49 @@ class StringInputStream(object):
             Explicit BOM 	        #xEF 	 #xBB 	 #xBF 	  	     UTF-8
             Default 	  	  	    UTF-8
         """
+        x00 = ord('\x00')
+        xfe = ord('\xFE')
+        xff = ord('\xFF')
+        xef = ord('\xEF')
+        xbb = ord('\xBB')
+        xbf = ord('\xBF')
+        if six.PY2:
+            d = [ord(c) for c in input_str]
+        else:
+            if isinstance(input_str, str):
+                d = [ord(c) for c in input_str]
+            else:
+                assert isinstance(input_str, bytes)
+                d = [c for c in input_str]
+
         bom = ''
-        if len(d) >= 4 and d[0] == '\x00' and d[1] == '\x00' and d[2] == '\xFE' and d[3] == '\xFF':
+        if len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == xfe and d[3] == xff:
             encoding = 'utf-32-be'
             bom = d[0:4]
-        elif len(d) >= 4 and d[0] == '\x00' and d[1] == '\x00' and d[2] == '\x00':
+        elif len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == x00:
             encoding = 'utf-32-be'
-        elif len(d) >= 4 and d[0] == '\xFF' and d[1] == '\xFE' and d[2] == '\x00' and d[3] == '\x00':
+        elif len(d) >= 4 and d[0] == xff and d[1] == xfe and d[2] == x00 and d[3] == x00:
             encoding = 'utf-32-le'
             bom = d[0:4]
-        elif len(d) >= 2 and d[1] == '\x00' and d[2] == '\x00' and d[3] == '\x00':
+        elif len(d) >= 2 and d[1] == x00 and d[2] == x00 and d[3] == x00:
             encoding = 'utf-32-le'
-        elif len(d) >= 2 and d[0] == '\xFE' and d[1] == '\xFF':
+        elif len(d) >= 2 and d[0] == xfe and d[1] == xff:
             encoding = 'utf-16-be'
             bom = d[0:2]
-        elif d[0] == '\x00':
+        elif d[0] == x00:
             encoding = 'utf-16-be'
-        elif len(d) >= 2 and d[0] == '\xFF' and d[1] == '\xFE':
+        elif len(d) >= 2 and d[0] == xff and d[1] == xfe:
             encoding = 'utf-16-le'
             bom = d[0:2]
-        elif len(d) >= 2 and d[1] == '\x00':
+        elif len(d) >= 2 and d[1] == x00:
             encoding = 'utf-16-le'
-        elif len(d) >= 3 and d[0] == '\xEF' and d[1] == '\xBB' and d[2] == '\xBF':
+        elif len(d) >= 3 and d[0] == xef and d[1] == xbb and d[2] == xbf:
             encoding = 'utf-8'
             bom = d[0:3]
         else:
             encoding = 'utf-8'
-
-        self.data = []
-        if len(bom) > 0:
-            bom_int = 0
-            for i in range(len(bom)):
-                bom_int = bom_int << 8
-                bom_int = bom_int | ord(bom[i])
-            self.data.append(bom_int)
-
-        if six.PY2:
-            self.data.extend([ord(c) for c in d[len(bom):].decode(encoding=encoding)])
-        else:
-            self.data.extend(d[len(bom):].decode(encoding=encoding))
-
+        self.encoding = encoding
+        self.data = [c for c in bom] + [ord(c) for c in (input_str[len(bom):].decode(encoding=encoding))]
         self._index = 0
         self._size = len(self.data)
 
@@ -128,12 +132,28 @@ class StringInputStream(object):
         if stop >= self._size:
             stop = self._size - 1
         if start >= self._size:
-            return u""
+            return ""
         else:
-            return to_unicode(self.data[start:stop + 1])
+            if six.PY2:
+                return to_unicode(self.data[start:stop + 1])
+            else:
+                r = ''
+                r = r.join([chr(c) for c in self.data[start:stop + 1]])
+                return r
 
     def __str__(self):
-        return unicode(self)
+        return self.data
 
-    def __unicode__(self):
-        return self.strdata
+    # def getText(self, start, stop):
+    #     if stop >= self._size:
+    #         stop = self._size - 1
+    #     if start >= self._size:
+    #         return u""
+    #     else:
+    #         return to_unicode(self.data[start:stop + 1])
+
+    # def __str__(self):
+    #     return unicode(self)
+    #
+    # def __unicode__(self):
+    #     return self.string_data
