@@ -192,6 +192,7 @@ with open("README.md", "r") as fh:
                 'tox',
                 'coveralls',
                 'twine',
+                'six'
             ]
         }
 

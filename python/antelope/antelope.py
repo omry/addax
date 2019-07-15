@@ -2,11 +2,11 @@ from antlr4 import *
 
 from . import YAMLLexer
 from . import YAMLParser
-
+from . import yaml_input_stream
 
 class Antelope(object):
     def __init__(self, s):
-        istream = InputStream(s)
+        istream = yaml_input_stream.StringInputStream(s)
         self.parse(istream)
 
     def parse(self, istream):
