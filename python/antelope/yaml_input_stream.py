@@ -143,17 +143,3 @@ class StringInputStream(object):
 
     def __str__(self):
         return self.data
-
-    # def getText(self, start, stop):
-    #     if stop >= self._size:
-    #         stop = self._size - 1
-    #     if start >= self._size:
-    #         return u""
-    #     else:
-    #         return to_unicode(self.data[start:stop + 1])
-
-    # def __str__(self):
-    #     return unicode(self)
-    #
-    # def __unicode__(self):
-    #     return self.string_data

@@ -1,26 +1,18 @@
-from antelope import Antelope
+# -*- coding: utf-8 -*-g
 import pytest
-
-from antelope import YAMLLexer
 from antlr4 import *
+import six
+from antelope import YAMLLexer
 from antelope.yaml_input_stream import StringInputStream
 
 
-# def get_test_files():
-#     return [
-#         ('a', 1),
-#         ('b', 2),
-#         ('c', 3),
-#         ('d', 4),
-#     ]
-#
-#
-# @pytest.mark.parametrize('test_name,file', get_test_files())
-# def test_foo(test_name, file):
-#   pass
-
-
-@pytest.mark.parametrize('bom,encoding', [
+@pytest.mark.parametrize('input_str', [
+    u'abcdé',
+    u'אבג',
+    'abcde',
+])
+@pytest.mark.parametrize('bom,input_encoding', [
+    # with bom
     (b'\xef\xbb\xbf', None),
     (b'\xef\xbb\xbf', 'utf-8'),
     (b'\xfe\xff', 'utf-16-be'),
@@ -28,6 +20,7 @@ from antelope.yaml_input_stream import StringInputStream
     (b'\x00\x00\xfe\xff', 'utf-32-be'),
     (b'\xff\xfe\x00\x00', 'utf-32-le'),
 
+    # without bom, correctly identifies only if first character is ascii
     (None, None),
     (None, 'utf-8'),
     (None, 'utf-16-be'),
@@ -35,14 +28,17 @@ from antelope.yaml_input_stream import StringInputStream
     (None, 'utf-32-be'),
     (None, 'utf-32-le'),
 ])
-def test_string_input_stream(bom, encoding):
-    input_str = "abcde"
-    if encoding is None:
-        encoding = 'utf-8'
-    s = input_str.encode(encoding=encoding)
-
+def test_string_input_stream(bom, input_encoding, input_str):
+    if input_encoding is None:
+        input_encoding = 'utf-8'
+    s = input_str.encode(encoding=input_encoding)
     bom_len = 0
-    if bom is not None:
+    if bom is None:
+        # non ascii first character and no bom.
+        # this is not expected to work correctly.
+        if ord(input_str[0]) >= 128:
+            return
+    else:
         s = bom + s
         bom_len = len(bom)
     stream = StringInputStream(s)
@@ -52,12 +48,14 @@ def test_string_input_stream(bom, encoding):
         # consume bom
         stream.consume()
     assert stream.size - stream.index == len(input_str)
-    assert stream.LA(1) == ord("a")
+    assert stream.LA(1) == ord(input_str[0])
     stream.consume()
     assert stream.index == bom_len + 1
     stream.seek(bom_len + len(input_str))
     assert stream.LA(1) == Token.EOF
-    assert stream.getText(bom_len + 1, bom_len + 3) == 'bcd'
+    for i in range(len(input_str)):
+        for j in range(len(input_str)):
+            assert stream.getText(bom_len + i, bom_len + j) == input_str[i:j + 1]
     stream.reset()
     assert stream.index == 0
 
