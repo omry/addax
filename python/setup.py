@@ -192,7 +192,9 @@ with open("README.md", "r") as fh:
                 'tox',
                 'coveralls',
                 'twine',
-                'six'
+                'six',
+                # some tests operate on large arrays
+                'numpy',
             ]
         }
 

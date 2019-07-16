@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-g
 import pytest
 from antlr4 import *
-import six
+import numpy as np
 from antelope import YAMLLexer
 from antelope.yaml_input_stream import StringInputStream
+from .utils import *
 
 
 @pytest.mark.parametrize('input_str', [
@@ -73,3 +74,34 @@ def test_lexer_bom(bom_str, token):
     tokens = lexer.getAllTokens()
     assert len(tokens) == 1
     assert tokens[0].type == token
+
+
+def assert_all_printable(data):
+    lexer = YAMLLexer(StringInputStream(data, 'utf-8'))
+    for t in lexer.getAllTokens():
+        assert t.type == YAMLLexer.C_PRINTABLE
+
+
+#
+# def test_c_printable_8bit():
+#     # '\u0009' | '\u000A' | '\u000D' | '\u0020'..'\u007E'
+#     assert_all_printable(b'\x09\x0a\x0d')
+#     assert_all_printable(str(list(char_range(b'\x20', b'\x7e'))).encode('utf-8'))
+#
+#
+# def create_16bit_range(c1, c2):
+#     d1 = bytes_to_unsigned(c1)
+#     d2 = bytes_to_unsigned(c2)
+#     return np.arange(d1, d2, dtype=np.uint16)
+#
+# @pytest.mark.parametrize('data', [
+#     #  '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFFFD'
+#     b'\00\x85',
+#     create_16bit_range(b'\x00\xa0', b'\xd7\xff'),
+#     # str(list(char_range(b'\x00\xa0', b'\xd7\xff'))).encode('utf-8'),
+#     # str(list(char_range(b'\xe0\x00', b'\xff\xfd'))).encode('utf-8')
+# ])
+# def test_c_printable_16bit(data):
+#     if isinstance(data, np.ndarray):
+#         data = data.tostring()
+#     assert_all_printable(data)

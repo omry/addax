@@ -7,53 +7,58 @@ yaml_stream: ;
 //document  : YAML_HEADER? bom_marker? WORD+;
 //bom_marker: BOM_UTF32_LE | BOM_UTF32_LE | BOM_UTF16_BE | BOM_UTF16_LE | BOM_UTF8;
 
-//FOO: '\u0001' '\u0000' '\u0001' '\u0000';
-//YAML_HEADER: '%YAML' FLOAT;
 BOM_UTF32_BE: '\u0000' '\u0000' '\u00fe' '\u00ff';
 BOM_UTF32_LE: '\u00ff' '\u00fe' '\u0000' '\u0000';
 BOM_UTF16_BE: '\u00fe' '\u00ff';
 BOM_UTF16_LE: '\u00ff' '\u00fe';
 BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
 
-//C_SEQUENCE_ENTRY : '-';
-//C_MAPPING_KEY : '?';
-//C_MAPPING_VALUE : ':';
-//C_COLLECT_ENTRY : ',';
-//C_SEQUENCE_START : '[';
-//C_SEQUENCE_END : ']';
-//C_MAPPING_START : '{';
-//C_MAPPING_END : '}';
-//C_COMMENT : '#';
-//C_ANCHOR : '&';
-//C_ALIAS : '*';
-//C_TAG : '!';
-//C_LITERAL : '|';
-//C_FOLDED : '>';
-//C_SINGLE_QUOTE : '\'';
-//C_DOUBLE_QUOTE : '"';
-//C_DIRECTIVE : '%';
-//C_RESERVED : '@'  | '`';
-//
-//// From  spec, unclear if needed
-//C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
-//              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
-//              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
-//              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
-//
-//C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
+// Character Set
 
-//C_PRINTABLE: '\u0009' |  '\u000A' |  '\u000A' | ['\u0020' - '\u007E'] | // 8 bit
-//             '\u0085' | ['\u00A0'-'\uD7FF'] | ['\uE000'-'\uFFFD'] |     // 16 bit
-//             ['\u10000'-'\u10FFFF'];                                    // 32 bit
-//
+// 8 bit : #x9 | #xA | #xD | [#x20-#x7E]
+fragment PRINTABLE_8BIT : '\u0009' |  '\u000A' |  '\u000D' | '\u0020'..'\u007E';
+
+// 16 bit: #x85 | [#xA0-#xD7FF] | [#xE000-#xFFFD]
+fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFFFD';
+
+// 32 bit: [#x10000-#x10FFFF]
+// split into two segments:
+// 0x010000 - 0x0FFFFF
+// 0x100000 - 0x10FFFF
+fragment PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uFFFF' | '\u0010' '\u0000'..'\uFFFF';
+
+C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
+
 //BB_JSON:   '\u00009' | ['\u0020'-'\u10FFFF'];
 
+// Indicator Characters
+C_SEQUENCE_ENTRY : '-';
+C_MAPPING_KEY : '?';
+C_MAPPING_VALUE : ':';
+C_COLLECT_ENTRY : ',';
+C_SEQUENCE_START : '[';
+C_SEQUENCE_END : ']';
+C_MAPPING_START : '{';
+C_MAPPING_END : '}';
+C_COMMENT : '#';
+C_ANCHOR : '&';
+C_ALIAS : '*';
+C_TAG : '!';
+C_LITERAL : '|';
+C_FOLDED : '>';
+C_SINGLE_QUOTE : '\'';
+C_DOUBLE_QUOTE : '"';
+C_DIRECTIVE : '%';
+C_RESERVED : '@'  | '`';
 
-// temporary, not from the spec.
-CHAR: [0-9a-zA-Z_\-];
-WORD: CHAR+;
+C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
+              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
+              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
+              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
 
-//DIGIT: [0-9];
-//NZ_DIGIT: [1-9];
-//FLOAT: NZ_DIGIT DIGIT* . DIGIT*;
+C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
 
+// Line Break Characters
+B_LINE_FEED: '\u000a';       /* LF */
+B_CARRIAGE_RETURN: '\u000d'; /* CR */
+B_CHAR:  B_LINE_FEED | B_CARRIAGE_RETURN;

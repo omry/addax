@@ -16,7 +16,11 @@ if six.PY2:
 
 class StringInputStream(object):
 
-    def __init__(self, input_str):
+    def __init__(self, input_str, input_encoding = None):
+        """
+        :param input_str:
+        :param input_encoding: by default auto detects based on bom rules. if specified bom is ignored.
+        """
         self.name = "<empty>"
         """
                                     Byte0    Byte1   Byte2   Byte3   Encoding
@@ -47,31 +51,34 @@ class StringInputStream(object):
                 d = [c for c in input_str]
 
         bom = ''
-        if len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == xfe and d[3] == xff:
-            encoding = 'utf-32-be'
-            bom = d[0:4]
-        elif len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == x00:
-            encoding = 'utf-32-be'
-        elif len(d) >= 4 and d[0] == xff and d[1] == xfe and d[2] == x00 and d[3] == x00:
-            encoding = 'utf-32-le'
-            bom = d[0:4]
-        elif len(d) >= 2 and d[1] == x00 and d[2] == x00 and d[3] == x00:
-            encoding = 'utf-32-le'
-        elif len(d) >= 2 and d[0] == xfe and d[1] == xff:
-            encoding = 'utf-16-be'
-            bom = d[0:2]
-        elif d[0] == x00:
-            encoding = 'utf-16-be'
-        elif len(d) >= 2 and d[0] == xff and d[1] == xfe:
-            encoding = 'utf-16-le'
-            bom = d[0:2]
-        elif len(d) >= 2 and d[1] == x00:
-            encoding = 'utf-16-le'
-        elif len(d) >= 3 and d[0] == xef and d[1] == xbb and d[2] == xbf:
-            encoding = 'utf-8'
-            bom = d[0:3]
+        if input_encoding is None:
+            if len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == xfe and d[3] == xff:
+                encoding = 'utf-32-be'
+                bom = d[0:4]
+            elif len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == x00:
+                encoding = 'utf-32-be'
+            elif len(d) >= 4 and d[0] == xff and d[1] == xfe and d[2] == x00 and d[3] == x00:
+                encoding = 'utf-32-le'
+                bom = d[0:4]
+            elif len(d) >= 2 and d[1] == x00 and d[2] == x00 and d[3] == x00:
+                encoding = 'utf-32-le'
+            elif len(d) >= 2 and d[0] == xfe and d[1] == xff:
+                encoding = 'utf-16-be'
+                bom = d[0:2]
+            elif d[0] == x00:
+                encoding = 'utf-16-be'
+            elif len(d) >= 2 and d[0] == xff and d[1] == xfe:
+                encoding = 'utf-16-le'
+                bom = d[0:2]
+            elif len(d) >= 2 and d[1] == x00:
+                encoding = 'utf-16-le'
+            elif len(d) >= 3 and d[0] == xef and d[1] == xbb and d[2] == xbf:
+                encoding = 'utf-8'
+                bom = d[0:3]
+            else:
+                encoding = 'utf-8'
         else:
-            encoding = 'utf-8'
+            encoding = input_encoding
         self.encoding = encoding
         self.data = [c for c in bom] + [ord(c) for c in (input_str[len(bom):].decode(encoding=encoding))]
         self._index = 0
