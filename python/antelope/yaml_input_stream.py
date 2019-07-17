@@ -1,13 +1,6 @@
 import six
+import utils
 
-# Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
-# Use of this file is governed by the BSD 3-clause license that
-# can be found in the LICENSE.txt file in the project root.
-#
-
-#
-#  Vacuum all input from a string and then treat it like a buffer.
-#
 from antlr4.Token import Token
 
 if six.PY2:
@@ -16,71 +9,14 @@ if six.PY2:
 
 class StringInputStream(object):
 
-    def __init__(self, input_str, input_encoding = None):
+    def __init__(self, input_str, input_encoding=None):
         """
         :param input_str:
         :param input_encoding: by default auto detects based on bom rules. if specified bom is ignored.
         """
         self.name = "<empty>"
-        """
-                                    Byte0    Byte1   Byte2   Byte3   Encoding
-            Explicit BOM            #x00 	 #x00 	 #xFE 	 #xFF 	 UTF-32BE
-            ASCII first character 	#x00 	 #x00 	 #x00 	 any 	 UTF-32BE
-            Explicit BOM 	        #xFF 	 #xFE 	 #x00 	 #x00 	 UTF-32LE
-            ASCII first character 	any 	 #x00 	 #x00 	 #x00 	 UTF-32LE
-            Explicit BOM 	        #xFE 	 #xFF       	  	  	 UTF-16BE
-            ASCII first character 	#x00 	 any 	  	          	 UTF-16BE
-            Explicit BOM 	        #xFF 	 #xFE 	  	  	         UTF-16LE
-            ASCII first character 	any 	 #x00 	  	  	         UTF-16LE
-            Explicit BOM 	        #xEF 	 #xBB 	 #xBF 	  	     UTF-8
-            Default 	  	  	    UTF-8
-        """
-        x00 = ord('\x00')
-        xfe = ord('\xFE')
-        xff = ord('\xFF')
-        xef = ord('\xEF')
-        xbb = ord('\xBB')
-        xbf = ord('\xBF')
-        if six.PY2:
-            d = [ord(c) for c in input_str]
-        else:
-            if isinstance(input_str, str):
-                d = [ord(c) for c in input_str]
-            else:
-                assert isinstance(input_str, bytes)
-                d = [c for c in input_str]
-
-        bom = ''
-        if input_encoding is None:
-            if len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == xfe and d[3] == xff:
-                encoding = 'utf-32-be'
-                bom = d[0:4]
-            elif len(d) >= 4 and d[0] == x00 and d[1] == x00 and d[2] == x00:
-                encoding = 'utf-32-be'
-            elif len(d) >= 4 and d[0] == xff and d[1] == xfe and d[2] == x00 and d[3] == x00:
-                encoding = 'utf-32-le'
-                bom = d[0:4]
-            elif len(d) >= 2 and d[1] == x00 and d[2] == x00 and d[3] == x00:
-                encoding = 'utf-32-le'
-            elif len(d) >= 2 and d[0] == xfe and d[1] == xff:
-                encoding = 'utf-16-be'
-                bom = d[0:2]
-            elif d[0] == x00:
-                encoding = 'utf-16-be'
-            elif len(d) >= 2 and d[0] == xff and d[1] == xfe:
-                encoding = 'utf-16-le'
-                bom = d[0:2]
-            elif len(d) >= 2 and d[1] == x00:
-                encoding = 'utf-16-le'
-            elif len(d) >= 3 and d[0] == xef and d[1] == xbb and d[2] == xbf:
-                encoding = 'utf-8'
-                bom = d[0:3]
-            else:
-                encoding = 'utf-8'
-        else:
-            encoding = input_encoding
-        self.encoding = encoding
-        self.data = [c for c in bom] + [ord(c) for c in (input_str[len(bom):].decode(encoding=encoding))]
+        bom, self.encoding = utils.get_bom_from_string(input_str, input_encoding)
+        self.data = [c for c in bom] + [ord(c) for c in (input_str[len(bom):].decode(encoding=self.encoding))]
         self._index = 0
         self._size = len(self.data)
 
