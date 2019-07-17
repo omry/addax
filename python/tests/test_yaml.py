@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-g
 import pytest
 from antlr4 import *
-
+from antlr4.error.ErrorListener import ErrorListener
 from antelope import YAMLLexer
 from antelope.yaml_input_stream import StringInputStream
 
@@ -73,6 +73,30 @@ def test_lexer_bom(bom_str, token):
     tokens = lexer.getAllTokens()
     assert len(tokens) == 1
     assert tokens[0].type == token
+
+
+def test_lexer_illegal_bom():
+    bom = b'\xef\xbb\xbf'
+    s = b'[]' + bom + b'[]'
+    inp = StringInputStream(s)
+    lexer = YAMLLexer(inp)
+    lexer.removeErrorListeners()
+
+    class MyErrorListener(ErrorListener):
+        def __init__(self):
+            self.errors = []
+
+        def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+            self.errors.append(column)
+
+    listener = MyErrorListener()
+    lexer.addErrorListener(listener)
+    tokens = lexer.getAllTokens()
+    assert [t.type for t in tokens] == [YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END,
+                                        YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END]
+    assert len(listener.errors) == 1
+    # error in column 2
+    assert listener.errors[0] == 2
 
 
 @pytest.mark.parametrize('s, token', [
