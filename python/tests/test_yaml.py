@@ -75,27 +75,26 @@ def test_lexer_bom(bom_str, token):
     assert tokens[0].type == token
 
 
-#
-# C_SEQUENCE_ENTRY : '-';
-# C_MAPPING_KEY : '?';
-# C_MAPPING_VALUE : ':';
-# C_COLLECT_ENTRY : ',';
-# C_SEQUENCE_START : '[';
-# C_SEQUENCE_END : ']';
-# C_MAPPING_START : '{';
-# C_MAPPING_END : '}';
-# C_COMMENT : '#';
-# C_ANCHOR : '&';
-# C_ALIAS : '*';
-# C_TAG : '!';
-# C_LITERAL : '|';
-# C_FOLDED : '>';
-# C_SINGLE_QUOTE : '\'';
-# C_DOUBLE_QUOTE : '"';
-# C_DIRECTIVE : '%';
-# C_RESERVED : '@'  | '`';
 @pytest.mark.parametrize('s, token', [
-    (b'-', YAMLLexer.C_SEQUENCE_ENTRY)
+    (b'-', YAMLLexer.C_SEQUENCE_ENTRY),
+    (b'?', YAMLLexer.C_MAPPING_KEY),
+    (b':', YAMLLexer.C_MAPPING_VALUE),
+    (b',', YAMLLexer.C_COLLECT_ENTRY),
+    (b'[', YAMLLexer.C_SEQUENCE_START),
+    (b']', YAMLLexer.C_SEQUENCE_END),
+    (b'{', YAMLLexer.C_MAPPING_START),
+    (b'}', YAMLLexer.C_MAPPING_END),
+    (b'#', YAMLLexer.C_COMMENT),
+    (b'&', YAMLLexer.C_ANCHOR),
+    (b'*', YAMLLexer.C_ALIAS),
+    (b'!', YAMLLexer.C_TAG),
+    (b'|', YAMLLexer.C_LITERAL),
+    (b'>', YAMLLexer.C_FOLDED),
+    (b'\'', YAMLLexer.C_SINGLE_QUOTE),
+    (b'"', YAMLLexer.C_DOUBLE_QUOTE),
+    (b'%', YAMLLexer.C_DIRECTIVE),
+    (b'@', YAMLLexer.C_RESERVED),
+    (b'`', YAMLLexer.C_RESERVED),
 ])
 def test_indicators(s, token):
     inp = StringInputStream(s)
