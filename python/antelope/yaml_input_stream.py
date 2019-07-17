@@ -14,7 +14,6 @@ class StringInputStream(object):
         :param input_str:
         :param input_encoding: by default auto detects based on bom rules. if specified bom is ignored.
         """
-        self.name = "<empty>"
         bom, self.encoding = utils.get_bom_from_string(input_str, input_encoding)
         self.data = [c for c in bom] + [ord(c) for c in (input_str[len(bom):].decode(encoding=self.encoding))]
         self._index = 0

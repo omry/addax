@@ -25,11 +25,15 @@ fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFFFD';
 // split into two segments:
 // 0x010000 - 0x0FFFFF
 // 0x100000 - 0x10FFFF
-fragment PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uFFFF' | '\u0010' '\u0000'..'\uFFFF';
+fragment PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uffff' | '\u0010' '\u0000'..'\uffff';
 
-C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
+C_PRINTABLE: (PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT);
 
-//BB_JSON:   '\u00009' | ['\u0020'-'\u10FFFF'];
+// nb-json 	::= 	#x9 | [#x20-#x10FFFF]
+fragment NB_JSON_1: '\u00009';
+fragment NB_JSON_2: '\u0020'..'\uffff';
+fragment NB_JSON_3: '\u0001'..'\u0010' '\u0000'..'\uffff';
+NB_JSON: NB_JSON_1 | NB_JSON_2 | NB_JSON_3;
 
 // Indicator Characters
 C_SEQUENCE_ENTRY : '-';
@@ -62,3 +66,7 @@ C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPI
 B_LINE_FEED: '\u000a';       /* LF */
 B_CARRIAGE_RETURN: '\u000d'; /* CR */
 B_CHAR:  B_LINE_FEED | B_CARRIAGE_RETURN;
+
+
+
+
