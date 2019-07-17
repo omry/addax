@@ -72,7 +72,7 @@ def test_lexer_bom(bom_str, token):
     lexer = YAMLLexer(inp)
     tokens = lexer.getAllTokens()
     assert len(tokens) == 1
-    assert tokens[0].type == token
+    assert_token(tokens[0], token)
 
 
 def test_lexer_illegal_bom():
@@ -92,8 +92,9 @@ def test_lexer_illegal_bom():
     listener = MyErrorListener()
     lexer.addErrorListener(listener)
     tokens = lexer.getAllTokens()
-    assert [t.type for t in tokens] == [YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END,
-                                        YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END]
+
+    assert_token(tokens, [YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END,
+                          YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END])
     assert len(listener.errors) == 1
     # error in column 2
     assert listener.errors[0] == 2
@@ -124,5 +125,20 @@ def test_indicators(s, token):
     inp = StringInputStream(s)
     lexer = YAMLLexer(inp)
     tokens = lexer.getAllTokens()
-    assert tokens[0].type == token, "Expected {}, matched {}".format(YAMLLexer.symbolicNames[token],
-                                                                     YAMLLexer.symbolicNames[tokens[0].type])
+    assert len(tokens) == 1
+    assert_token(tokens[0], token)
+
+
+def assert_token(token_or_tokens, expected_type_or_types):
+    if isinstance(token_or_tokens, list) and isinstance(expected_type_or_types, list):
+        for i in range(len(token_or_tokens)):
+            actual_type = token_or_tokens[i].type
+            expected_type = expected_type_or_types[i]
+            assert actual_type == expected_type, "Token #{}: Expected {}, matched {}".format(
+                i,
+                YAMLLexer.symbolicNames[expected_type],
+                YAMLLexer.symbolicNames[actual_type])
+    else:
+        assert token_or_tokens.type == expected_type_or_types, "Expected {}, matched {}".format(
+            YAMLLexer.symbolicNames[expected_type_or_types],
+            YAMLLexer.symbolicNames[token_or_tokens.type])
