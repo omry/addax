@@ -16,15 +16,15 @@ BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
 // Character Set
 //
 // 8 bit : #x9 | #xA | #xD | [#x20-#x7E]
-fragment PRINTABLE_8BIT: '\u0009' | '\u000A' | '\u000D' | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002b' | '\u002e'..'\u0039' | '\u003b'..'\u003d' | '\u0041'..'\u005a' | '\u005c' | '\u005e'..'\u005f' | '\u0061'..'\u007a' | '\u007e';
+PRINTABLE_8BIT: '\u0009' | '\u000A' | '\u000D' | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002b' | '\u002e'..'\u0039' | '\u003b'..'\u003d' | '\u0041'..'\u005a' | '\u005c' | '\u005e'..'\u005f' | '\u0061'..'\u007a' | '\u007e';
 // 16 bit: #x85 | [#xA0-#xD7FF] | [#xE000-#xFFFD]
-fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFFFD';
+PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFFFD';
 //
 // 32 bit: [#x10000-#x10FFFF]
 // split into two segments:
 // 0x010000 - 0x0FFFFF
 // 0x100000 - 0x10FFFF
-fragment PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uffff' | '\u0010' '\u0000'..'\uffff';
+PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uffff' | '\u0010' '\u0000'..'\uffff';
 
 //C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
 C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT ;

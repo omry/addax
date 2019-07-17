@@ -75,9 +75,16 @@ def test_lexer_bom(bom_str, token):
     assert_token(tokens[0], token)
 
 
-def test_lexer_illegal_bom():
-    bom = b'\xef\xbb\xbf'
-    s = b'[]' + bom + b'[]'
+@pytest.mark.parametrize('bom_str', [
+    b'\xef\xbb\xbf',
+    b'\xfe\xff',
+    b'\xff\xfe',
+    b'\x00\x00\xfe\xff',
+    b'\xff\xfe\x00\x00',
+])
+def test_lexer_illegal_bom(bom_str):
+    bom_str = b'\xef\xbb\xbf'
+    s = b'[]' + bom_str + b'[]'
     inp = StringInputStream(s)
     lexer = YAMLLexer(inp)
     lexer.removeErrorListeners()

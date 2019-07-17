@@ -1,23 +1,36 @@
 """
 A small utility hat help generates some fragments for YAML.g4
 """
+import struct
 
 
 def create_segments(range_start, range_end, excluded):
-    # fragment PRINTABLE_8BIT: '\u0009' | '\u000A' | '\u000D' | '\u0020'..'\u007E'
-    s = "fragment PRINTABLE_8BIT: '\\u0009' | '\\u000A' | '\\u000D'"
+    ordinals = []
+    for c in excluded:
+        if len(c) == 1:
+            n = ord(c)
+        elif len(c) == 2:
+            n = struct.unpack('>H', c)[0]
+        elif len(c) == 3:
+            n = struct.unpack('>I', b'\x00' + c)[0]
+        elif len(c) == 4:
+            n = struct.unpack('>I', c)[0]
+        else:
+            assert False
+        ordinals.append(n)
 
-    excluded = [ord(c) for c in excluded]
-    excluded = sorted(excluded)
+    excluded = sorted(ordinals)
 
     segments = []
     seg_start = range_start
     for i in range(len(excluded)):
-        ex_8bit = excluded[i]
-        skip = ex_8bit == seg_start
+        ex = excluded[i]
+        if ex < seg_start or ex >= range_end:
+            continue
+        skip = ex == seg_start
         if not skip:
-            segments.append((seg_start, ex_8bit - 1))
-        seg_start = ex_8bit + 1
+            segments.append((seg_start, ex - 1))
+        seg_start = ex + 1
     # close the last segment
     segments.append((seg_start, range_end))
     return segments
@@ -36,30 +49,40 @@ def print_8bit_segments(segments):
     print(s)
 
 
+def main():
+    excluded = [
+        # indicators
+        '-',
+        '?',
+        ':',
+        ',',
+        '[',
+        ']',
+        '{',
+        '}',
+        '#',
+        '&',
+        '*',
+        '!',
+        '|',
+        '>',
+        '\'',
+        '"',
+        '%',
+        '@',
+        '`',
+        b'\xef\xbb\xbf',
+        b'\xfe\xff',
+        b'\xff\xfe',
+        b'\x00\x00\xfe\xff',
+        b'\xff\xfe\x00\x00',
+    ]
+    seg_8bit = create_segments(range_start=0x20, range_end=0x7e, excluded=excluded)
+    print_8bit_segments(seg_8bit)
+    seg_16bit_1 = create_segments(range_start=0x00A0, range_end=0xD7FF, excluded=excluded)
+    seg_16bit_2 = create_segments(range_start=0xE000, range_end=0xFFFD, excluded=excluded)
+    # print_16bit_segments(seg_16bit_1, seg_16bit_2)
+
+
 if __name__ == '__main__':
-    segments = create_segments(
-        range_start=0x20,
-        range_end=0x7e,
-        excluded=[
-            # indicators
-            '-',
-            '?',
-            ':',
-            ',',
-            '[',
-            ']',
-            '{',
-            '}',
-            '#',
-            '&',
-            '*',
-            '!',
-            '|',
-            '>',
-            '\'',
-            '"',
-            '%',
-            '@',
-            '`',
-        ])
-    print_8bit_segments(segments)
+    main()
