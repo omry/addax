@@ -39,14 +39,38 @@ def create_segments(range_start, range_end, excluded):
 def print_8bit_segments(segments):
     s = "fragment PRINTABLE_8BIT: '\\u0009' | '\\u000A' | '\\u000D'"
     for segment in segments:
-        s0 = hex(segment[0])[2:]
-        s1 = hex(segment[1])[2:]
+        s0 = hex(segment[0])[2:].zfill(4).upper()
+        s1 = hex(segment[1])[2:].zfill(4).upper()
         if s0 == s1:
-            s += " | '\\u00{}'".format(s0)
+            s += " | '\\u{}'".format(s0)
         else:
-            s += " | '\\u00{}'..'\\u00{}'".format(s0, s1)
+            s += " | '\\u{}'..'\\u{}'".format(s0, s1)
     s += ";"
     print(s)
+
+
+def append_16bit_segment(s, segments):
+    for segment in segments:
+        s0 = hex(segment[0])[2:].zfill(4).upper()
+        s1 = hex(segment[1])[2:].zfill(4).upper()
+        if s0 == s1:
+            s += " | '\\u{}'".format(s0)
+        else:
+            s += " | '\\u{}'..'\\u{}'".format(s0, s1)
+
+    return s
+
+
+def print_c_printable_16bit(seg_16bit_1, seg_16bit_2):
+    s = "fragment PRINTABLE_16BIT: '\\u0085'"
+    s = append_16bit_segment(s, seg_16bit_1)
+    s = append_16bit_segment(s, seg_16bit_2)
+    s += ";"
+    print(s)
+
+
+def print_nb_json_2_16bit(seg):
+    print("fragment NB_JSON_2: " + append_16bit_segment('', seg) + ";")
 
 
 def main():
@@ -81,7 +105,9 @@ def main():
     print_8bit_segments(seg_8bit)
     seg_16bit_1 = create_segments(range_start=0x00A0, range_end=0xD7FF, excluded=excluded)
     seg_16bit_2 = create_segments(range_start=0xE000, range_end=0xFFFD, excluded=excluded)
-    # print_16bit_segments(seg_16bit_1, seg_16bit_2)
+    print_c_printable_16bit(seg_16bit_1, seg_16bit_2)
+
+    print_nb_json_2_16bit(create_segments(range_start=0x0020, range_end=0xFFFF, excluded=excluded))
 
 
 if __name__ == '__main__':
