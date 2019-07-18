@@ -16,10 +16,9 @@ BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
 // Character Set
 // with all other tokens removed from it to prevent conflicts
 // 8 bit : #x9 | #xA | #xD | [#x20-#x7E]
-fragment PRINTABLE_8BIT: '\u0009' | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002B' | '\u002E'..'\u0039' | '\u003B'..'\u003D' | '\u0041'..'\u005A' | '\u005C' | '\u005E'..'\u005F' | '\u0061'..'\u007A' | '\u007E';
+fragment PRINTABLE_8BIT: '\u0024' | '\u0028'..'\u0029' | '\u002B' | '\u002E'..'\u0039' | '\u003B'..'\u003D' | '\u0041'..'\u005A' | '\u005C' | '\u005E'..'\u005F' | '\u0061'..'\u007A' | '\u007E';
 // 16 bit: #x85 | [#xA0-#xD7FF] | [#xE000-#xFFFD]
-fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFEFE' | '\uFF00'..'\uFFFD';
-//
+fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\u0D09' | '\u0D0B'..'\uD7FF' | '\uE000'..'\uFEFE' | '\uFF00'..'\uFFFD';
 // 32 bit: [#x10000-#x10FFFF]
 fragment PRINTABLE_32BIT: '\u{010000}'..'\u{10FFFF}';
 
@@ -28,7 +27,7 @@ NB_CHAR: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
 
 // TODO: this should only be allowed inside quoted strings.
 // nb-json 	::= 	#x9 | [#x20-#x10FFFF]
-fragment NB_JSON: '\u{000020}'..'\u{10FFFF}';
+//fragment NB_JSON: '\u{000020}'..'\u{10FFFF}';
 
 // Indicator Characters
 C_SEQUENCE_ENTRY: '-';
@@ -75,3 +74,10 @@ B_BREAK: B_CARRIAGE_RETURN B_LINE_FEED |
          B_CARRIAGE_RETURN |
          B_LINE_FEED;
 
+// Whitespace characters
+//[31] 	s-space	 ::= 	#x20            /* SP */
+//[32] 	s-tab    ::= 	#x9             /* TAB */
+//[33] 	s-white  ::= 	s-space | s-tab
+fragment S_SPACE: ' ';
+fragment S_TAB: '\t';
+S_WHITE: S_SPACE | S_TAB;

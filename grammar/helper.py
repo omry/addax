@@ -37,15 +37,18 @@ def create_segments(range_start, range_end, excluded):
 
 
 def print_8bit_segments(segments):
-    s = "fragment PRINTABLE_8BIT: '\\u0009' | '\\u000A' | '\\u000D'"
+    s = ''
     for segment in segments:
         s0 = hex(segment[0])[2:].zfill(4).upper()
         s1 = hex(segment[1])[2:].zfill(4).upper()
+        if s != '':
+            s += " | "
         if s0 == s1:
-            s += " | '\\u{}'".format(s0)
+            s += "'\\u{}'".format(s0)
         else:
-            s += " | '\\u{}'..'\\u{}'".format(s0, s1)
+            s += "'\\u{}'..'\\u{}'".format(s0, s1)
     s += ";"
+    s = "fragment PRINTABLE_8BIT: " + s
     print(s)
 
 
@@ -75,36 +78,39 @@ def print_nb_json_2_16bit(seg):
 
 def main():
     excluded = [
-        # # indicators
-        # '-',
-        # '?',
-        # ':',
-        # ',',
-        # '[',
-        # ']',
-        # '{',
-        # '}',
-        # '#',
-        # '&',
-        # '*',
-        # '!',
-        # '|',
-        # '>',
-        # '\'',
-        # '"',
-        # '%',
-        # '@',
-        # '`',
-        # # bom
-        # b'\xef\xbb\xbf',
-        # b'\xfe\xff',
-        # b'\xff\xfe',
-        # b'\x00\x00\xfe\xff',
-        # b'\xff\xfe\x00\x00',
-        # # line breaks
-        # b'\x0a',  # lf
-        # b'\x0d',  # cr
+        # indicators
+        '-',
+        '?',
+        ':',
+        ',',
+        '[',
+        ']',
+        '{',
+        '}',
+        '#',
+        '&',
+        '*',
+        '!',
+        '|',
+        '>',
+        '\'',
+        '"',
+        '%',
+        '@',
+        '`',
+        # bom
+        b'\xef\xbb\xbf',
+        b'\xfe\xff',
+        b'\xff\xfe',
+        b'\x00\x00\xfe\xff',
+        b'\xff\xfe\x00\x00',
+        # line breaks
+        b'\x0a',  # lf
+        b'\x0d',  # cr
         b'\x0d\x0a',  # crlf
+        # whitespace
+        b' ',
+        b'\t',
     ]
 
     seg_8bit = create_segments(range_start=0x20, range_end=0x7e, excluded=excluded)
@@ -112,10 +118,7 @@ def main():
     seg_16bit_1 = create_segments(range_start=0x00A0, range_end=0xD7FF, excluded=excluded)
     seg_16bit_2 = create_segments(range_start=0xE000, range_end=0xFFFD, excluded=excluded)
     print_c_printable_16bit(seg_16bit_1, seg_16bit_2)
-    print(create_segments(range_start=0x00010000, range_end=0x000FFFFF, excluded=excluded))
-    print(create_segments(range_start=0x00100000, range_end=0x0010FFFF, excluded=excluded))
-
-    print_nb_json_2_16bit(create_segments(range_start=0x0020, range_end=0xFFFF, excluded=excluded))
+    # print_nb_json_2_16bit(create_segments(range_start=0x0020, range_end=0xFFFF, excluded=excluded))
 
 
 if __name__ == '__main__':

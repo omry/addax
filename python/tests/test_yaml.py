@@ -135,6 +135,8 @@ def test_lexer_illegal_bom(bom_str):
     (b'\x0d\x0a', YAMLLexer.B_BREAK),
     (b'\x0d', YAMLLexer.B_BREAK),
     (b'\x0a', YAMLLexer.B_BREAK),
+    (b' ', YAMLLexer.S_WHITE),
+    (b'\t', YAMLLexer.S_WHITE),
 ])
 def test_tokens(s, token):
     inp = StringInputStream(s)
