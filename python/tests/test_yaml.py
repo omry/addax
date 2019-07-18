@@ -108,11 +108,11 @@ def test_lexer_illegal_bom(bom_str):
 
 
 @pytest.mark.parametrize('s, token', [
-    (b'\xef\xbb\xbf', YAMLLexer.BOM_UTF8),
-    (b'\xfe\xff', YAMLLexer.BOM_UTF16_BE),
-    (b'\xff\xfe', YAMLLexer.BOM_UTF16_LE),
-    (b'\x00\x00\xfe\xff', YAMLLexer.BOM_UTF32_BE),
-    (b'\xff\xfe\x00\x00', YAMLLexer.BOM_UTF32_LE),
+    (b'\xef\xbb\xbf', YAMLLexer.BOM_MARKER),
+    (b'\xfe\xff', YAMLLexer.BOM_MARKER),
+    (b'\xff\xfe', YAMLLexer.BOM_MARKER),
+    (b'\x00\x00\xfe\xff', YAMLLexer.BOM_MARKER),
+    (b'\xff\xfe\x00\x00', YAMLLexer.BOM_MARKER),
     (b'-', YAMLLexer.C_SEQUENCE_ENTRY),
     (b'?', YAMLLexer.C_MAPPING_KEY),
     (b':', YAMLLexer.C_MAPPING_VALUE),

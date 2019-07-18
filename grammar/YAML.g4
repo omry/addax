@@ -5,13 +5,13 @@ grammar YAML;
 
 yaml_stream: ;
 //document  : YAML_HEADER? bom_marker? WORD+;
-//bom_marker: BOM_UTF32_LE | BOM_UTF32_LE | BOM_UTF16_BE | BOM_UTF16_LE | BOM_UTF8;
 
-BOM_UTF32_BE: '\u0000' '\u0000' '\u00fe' '\u00ff';
-BOM_UTF32_LE: '\u00ff' '\u00fe' '\u0000' '\u0000';
-BOM_UTF16_BE: '\u00fe' '\u00ff';
-BOM_UTF16_LE: '\u00ff' '\u00fe';
-BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
+fragment BOM_UTF32_BE: '\u0000' '\u0000' '\u00fe' '\u00ff';
+fragment BOM_UTF32_LE: '\u00ff' '\u00fe' '\u0000' '\u0000';
+fragment BOM_UTF16_BE: '\u00fe' '\u00ff';
+fragment BOM_UTF16_LE: '\u00ff' '\u00fe';
+fragment BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
+BOM_MARKER: BOM_UTF32_BE | BOM_UTF32_LE | BOM_UTF16_BE | BOM_UTF16_LE | BOM_UTF8;
 
 // Character Set
 // with all other tokens removed from it to prevent conflicts
@@ -22,8 +22,8 @@ fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\u0D09' | '\u0D0B'..'\uD7FF' | '
 // 32 bit: [#x10000-#x10FFFF]
 fragment PRINTABLE_32BIT: '\u{010000}'..'\u{10FFFF}';
 
-// [27] 	nb-char 	::= 	c-printable - b-char - c-byte-order-mark
-NB_CHAR: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
+// None space char
+NS_CHAR: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
 
 // TODO: this should only be allowed inside quoted strings.
 // nb-json 	::= 	#x9 | [#x20-#x10FFFF]
@@ -49,14 +49,14 @@ C_DOUBLE_QUOTE : '"';
 C_DIRECTIVE : '%';
 C_RESERVED : '@'  | '`';
 
-//fragment
-//C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
-//              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
-//              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
-//              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
-//
-//fragment
-//C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
+fragment
+C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
+              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
+              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
+              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
+
+fragment
+C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
 
 
 // Line Break Characters
