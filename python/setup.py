@@ -193,8 +193,6 @@ with open("README.md", "r") as fh:
                 'coveralls',
                 'twine',
                 'six',
-                # some tests operate on large arrays
-                'numpy',
             ]
         }
 

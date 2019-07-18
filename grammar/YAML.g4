@@ -14,30 +14,24 @@ BOM_UTF16_LE: '\u00ff' '\u00fe';
 BOM_UTF8    : '\u00ef' '\u00bb' '\u00bf';
 
 // Character Set
-//
+// with all other tokens removed from it to prevent conflicts
 // 8 bit : #x9 | #xA | #xD | [#x20-#x7E]
-fragment PRINTABLE_8BIT: '\u0009' | '\u000A' | '\u000D' | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002B' | '\u002E'..'\u0039' | '\u003B'..'\u003D' | '\u0041'..'\u005A' | '\u005C' | '\u005E'..'\u005F' | '\u0061'..'\u007A' | '\u007E';
+fragment PRINTABLE_8BIT: '\u0009' | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002B' | '\u002E'..'\u0039' | '\u003B'..'\u003D' | '\u0041'..'\u005A' | '\u005C' | '\u005E'..'\u005F' | '\u0061'..'\u007A' | '\u007E';
 // 16 bit: #x85 | [#xA0-#xD7FF] | [#xE000-#xFFFD]
 fragment PRINTABLE_16BIT: '\u0085' | '\u00A0'..'\uD7FF' | '\uE000'..'\uFEFE' | '\uFF00'..'\uFFFD';
 //
 // 32 bit: [#x10000-#x10FFFF]
-// split into two segments:
-// 0x010000 - 0x0FFFFF
-// 0x100000 - 0x10FFFF
-fragment PRINTABLE_32BIT: '\u0001'..'\u000f' '\u0000'..'\uffff' | '\u0010' '\u0000'..'\uffff';
+fragment PRINTABLE_32BIT: '\u{010000}'..'\u{10FFFF}';
 
-//C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
-C_PRINTABLE: PRINTABLE_8BIT | PRINTABLE_16BIT ;
+// [27] 	nb-char 	::= 	c-printable - b-char - c-byte-order-mark
+NB_CHAR: PRINTABLE_8BIT | PRINTABLE_16BIT | PRINTABLE_32BIT;
 
-// TODO: this should only be allowed inside quoted scalars.
-//// nb-json 	::= 	#x9 | [#x20-#x10FFFF]
-//fragment NB_JSON_1: '\u00009';
-//fragment NB_JSON_2:  | '\u0020' | '\u0024' | '\u0028'..'\u0029' | '\u002B' | '\u002E'..'\u0039' | '\u003B'..'\u003D' | '\u0041'..'\u005A' | '\u005C' | '\u005E'..'\u005F' | '\u0061'..'\u007A' | '\u007E'..'\uFEFE' | '\uFF00'..'\uFFFD' | '\uFFFF';
-//fragment NB_JSON_3: '\u0001'..'\u0010' '\u0000'..'\uffff';
-//NB_JSON: NB_JSON_1 | NB_JSON_2 | NB_JSON_3;
+// TODO: this should only be allowed inside quoted strings.
+// nb-json 	::= 	#x9 | [#x20-#x10FFFF]
+fragment NB_JSON: '\u{000020}'..'\u{10FFFF}';
 
 // Indicator Characters
-C_SEQUENCE_ENTRY : '-';
+C_SEQUENCE_ENTRY: '-';
 C_MAPPING_KEY : '?';
 C_MAPPING_VALUE : ':';
 C_COLLECT_ENTRY : ',';
@@ -56,20 +50,28 @@ C_DOUBLE_QUOTE : '"';
 C_DIRECTIVE : '%';
 C_RESERVED : '@'  | '`';
 
-fragment
-C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
-              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
-              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
-              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
+//fragment
+//C_INDICATOR : C_SEQUENCE_ENTRY | C_MAPPING_KEY| C_MAPPING_VALUE | C_COLLECT_ENTRY |
+//              C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END |
+//              C_COMMENT | C_ANCHOR | C_ALIAS | C_TAG | C_LITERAL | C_FOLDED |
+//              C_SINGLE_QUOTE | C_DOUBLE_QUOTE | C_DIRECTIVE | C_RESERVED;
+//
+//fragment
+//C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
 
-fragment
-C_FLOW_INDICATOR : C_COLLECT_ENTRY | C_SEQUENCE_START | C_SEQUENCE_END | C_MAPPING_START | C_MAPPING_END;
 
 // Line Break Characters
+//[24] 	b-line-feed 	::= 	#xA    /* LF */
+//[25] 	b-carriage-return 	::= 	#xD    /* CR */
+//[26] 	b-char 	::= 	b-line-feed | b-carriage-return
 fragment B_LINE_FEED: '\u000a';       /* LF */
 fragment B_CARRIAGE_RETURN: '\u000d'; /* CR */
 fragment B_CHAR:  B_LINE_FEED | B_CARRIAGE_RETURN;
 
-
-
+//[28] 	b-break 	::= 	 ( b-carriage-return b-line-feed ) /* DOS, Windows */
+//                           | b-carriage-return               /* MacOS upto 9.x */
+//                           | b-line-feed                     /* UNIX, MacOS X */
+B_BREAK: B_CARRIAGE_RETURN B_LINE_FEED |
+         B_CARRIAGE_RETURN |
+         B_LINE_FEED;
 

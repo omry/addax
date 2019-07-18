@@ -6,6 +6,21 @@ from antelope import YAMLLexer
 from antelope.yaml_input_stream import StringInputStream
 
 
+def assert_token(token_or_tokens, expected_type_or_types):
+    if isinstance(token_or_tokens, list) and isinstance(expected_type_or_types, list):
+        for i in range(len(token_or_tokens)):
+            actual_type = token_or_tokens[i].type
+            expected_type = expected_type_or_types[i]
+            assert actual_type == expected_type, "Token #{}: Expected {}, matched {}".format(
+                i,
+                YAMLLexer.symbolicNames[expected_type],
+                YAMLLexer.symbolicNames[actual_type])
+    else:
+        assert token_or_tokens.type == expected_type_or_types, "Expected {}, matched {}".format(
+            YAMLLexer.symbolicNames[expected_type_or_types],
+            YAMLLexer.symbolicNames[token_or_tokens.type])
+
+
 @pytest.mark.parametrize('input_str', [
     u'abcdé',
     u'אבג',
@@ -60,21 +75,6 @@ def test_string_input_stream(bom, input_encoding, input_str):
     assert stream.index == 0
 
 
-@pytest.mark.parametrize('bom_str,token', [
-    (b'\xef\xbb\xbf', YAMLLexer.BOM_UTF8),
-    (b'\xfe\xff', YAMLLexer.BOM_UTF16_BE),
-    (b'\xff\xfe', YAMLLexer.BOM_UTF16_LE),
-    (b'\x00\x00\xfe\xff', YAMLLexer.BOM_UTF32_BE),
-    (b'\xff\xfe\x00\x00', YAMLLexer.BOM_UTF32_LE),
-])
-def test_lexer_bom(bom_str, token):
-    inp = StringInputStream(bom_str)
-    lexer = YAMLLexer(inp)
-    tokens = lexer.getAllTokens()
-    assert len(tokens) == 1
-    assert_token(tokens[0], token)
-
-
 @pytest.mark.parametrize('bom_str', [
     b'\xef\xbb\xbf',
     b'\xfe\xff',
@@ -108,6 +108,11 @@ def test_lexer_illegal_bom(bom_str):
 
 
 @pytest.mark.parametrize('s, token', [
+    (b'\xef\xbb\xbf', YAMLLexer.BOM_UTF8),
+    (b'\xfe\xff', YAMLLexer.BOM_UTF16_BE),
+    (b'\xff\xfe', YAMLLexer.BOM_UTF16_LE),
+    (b'\x00\x00\xfe\xff', YAMLLexer.BOM_UTF32_BE),
+    (b'\xff\xfe\x00\x00', YAMLLexer.BOM_UTF32_LE),
     (b'-', YAMLLexer.C_SEQUENCE_ENTRY),
     (b'?', YAMLLexer.C_MAPPING_KEY),
     (b':', YAMLLexer.C_MAPPING_VALUE),
@@ -127,25 +132,13 @@ def test_lexer_illegal_bom(bom_str):
     (b'%', YAMLLexer.C_DIRECTIVE),
     (b'@', YAMLLexer.C_RESERVED),
     (b'`', YAMLLexer.C_RESERVED),
+    (b'\x0d\x0a', YAMLLexer.B_BREAK),
+    (b'\x0d', YAMLLexer.B_BREAK),
+    (b'\x0a', YAMLLexer.B_BREAK),
 ])
-def test_indicators(s, token):
+def test_tokens(s, token):
     inp = StringInputStream(s)
     lexer = YAMLLexer(inp)
     tokens = lexer.getAllTokens()
     assert len(tokens) == 1
     assert_token(tokens[0], token)
-
-
-def assert_token(token_or_tokens, expected_type_or_types):
-    if isinstance(token_or_tokens, list) and isinstance(expected_type_or_types, list):
-        for i in range(len(token_or_tokens)):
-            actual_type = token_or_tokens[i].type
-            expected_type = expected_type_or_types[i]
-            assert actual_type == expected_type, "Token #{}: Expected {}, matched {}".format(
-                i,
-                YAMLLexer.symbolicNames[expected_type],
-                YAMLLexer.symbolicNames[actual_type])
-    else:
-        assert token_or_tokens.type == expected_type_or_types, "Expected {}, matched {}".format(
-            YAMLLexer.symbolicNames[expected_type_or_types],
-            YAMLLexer.symbolicNames[token_or_tokens.type])

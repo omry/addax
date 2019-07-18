@@ -75,37 +75,45 @@ def print_nb_json_2_16bit(seg):
 
 def main():
     excluded = [
-        # indicators
-        '-',
-        '?',
-        ':',
-        ',',
-        '[',
-        ']',
-        '{',
-        '}',
-        '#',
-        '&',
-        '*',
-        '!',
-        '|',
-        '>',
-        '\'',
-        '"',
-        '%',
-        '@',
-        '`',
-        b'\xef\xbb\xbf',
-        b'\xfe\xff',
-        b'\xff\xfe',
-        b'\x00\x00\xfe\xff',
-        b'\xff\xfe\x00\x00',
+        # # indicators
+        # '-',
+        # '?',
+        # ':',
+        # ',',
+        # '[',
+        # ']',
+        # '{',
+        # '}',
+        # '#',
+        # '&',
+        # '*',
+        # '!',
+        # '|',
+        # '>',
+        # '\'',
+        # '"',
+        # '%',
+        # '@',
+        # '`',
+        # # bom
+        # b'\xef\xbb\xbf',
+        # b'\xfe\xff',
+        # b'\xff\xfe',
+        # b'\x00\x00\xfe\xff',
+        # b'\xff\xfe\x00\x00',
+        # # line breaks
+        # b'\x0a',  # lf
+        # b'\x0d',  # cr
+        b'\x0d\x0a',  # crlf
     ]
+
     seg_8bit = create_segments(range_start=0x20, range_end=0x7e, excluded=excluded)
     print_8bit_segments(seg_8bit)
     seg_16bit_1 = create_segments(range_start=0x00A0, range_end=0xD7FF, excluded=excluded)
     seg_16bit_2 = create_segments(range_start=0xE000, range_end=0xFFFD, excluded=excluded)
     print_c_printable_16bit(seg_16bit_1, seg_16bit_2)
+    print(create_segments(range_start=0x00010000, range_end=0x000FFFFF, excluded=excluded))
+    print(create_segments(range_start=0x00100000, range_end=0x0010FFFF, excluded=excluded))
 
     print_nb_json_2_16bit(create_segments(range_start=0x0020, range_end=0xFFFF, excluded=excluded))
 
