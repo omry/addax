@@ -106,3 +106,112 @@ fragment NS_URI_CHAR:    '%' NS_HEX_DIGIT NS_HEX_DIGIT | NS_WORD_CHAR
 fragment NS_TAG_CHAR:  '%' NS_HEX_DIGIT NS_HEX_DIGIT | NS_WORD_CHAR
                      | '#' | ';' | '/' | '?' | ':' | '@' | '&' | '=' | '+'
                      | '$' | '_' | '.' | '~' | '*' | '\''| '(' | ')' |;
+
+// Escaped characters
+//[41] 	c-escape 	::= 	“\”
+fragment C_ESCAPE: '\\';
+
+//[42]	ns-esc-null	::=	“0”
+//	Escaped ASCII null (#x0) character.
+fragment NS_ESC_NULL: '0';
+
+//[43]	ns-esc-bell	::=	“a”
+//	Escaped ASCII bell (#x7) character.
+fragment NS_ESC_BELL: 'a';
+
+//[44]	ns-esc-backspace	::=	“b”
+//	Escaped ASCII backspace (#x8) character.
+fragment NS_ESC_BAKSPACE: 'b';
+
+//[45]	ns-esc-horizontal-tab	::=	“t” | #x9
+//	Escaped ASCII horizontal tab (#x9) character. This is useful at the start or the end of a line to force a leading or trailing tab to become part of the content.
+fragment NS_ESC_HORIZONTAL_TAB: 't';
+
+//[46]	ns-esc-line-feed	::=	“n”
+//	Escaped ASCII line feed (#xA) character.
+fragment NS_ESC_LINE_FEED: 'n';
+
+//[47]	ns-esc-vertical-tab	::=	“v”
+//	Escaped ASCII vertical tab (#xB) character.
+fragment NS_ESC_VERTICAL_TAB : 'v';
+
+//[48]	ns-esc-form-feed	::=	“f”
+//	Escaped ASCII form feed (#xC) character.
+fragment NS_ESC_FORM_FEED: 'f';
+
+//[49]	ns-esc-carriage-return	::=	“r”
+//	Escaped ASCII carriage return (#xD) character.
+fragment NS_ESC_CARRIAGE_RETURN: 'r';
+
+//[50]	ns-esc-escape	::=	“e”
+//	Escaped ASCII escape (#x1B) character.
+fragment NS_ESC_ESCAPE: 'e';
+
+//[51]	ns-esc-space	::=	#x20
+//	Escaped ASCII space (#x20) character. This is useful at the start or the end of a line to force a leading or trailing space to become part of the content.
+fragment NS_ESC_SPACE: ' ';
+
+//[52]	ns-esc-double-quote	::=	“"”
+//	Escaped ASCII double quote (#x22).
+fragment NS_ESC_DOUBLE_QUOTE: '"';
+
+//[53]	ns-esc-slash	::=	“/”
+//	Escaped ASCII slash (#x2F), for JSON compatibility.
+fragment NS_ESC_SLASH: '/';
+
+//[54]	ns-esc-backslash	::=	“\”
+//	Escaped ASCII back slash (#x5C).
+fragment NS_ESC_BACKSLASH: '\\';
+
+//[55]	ns-esc-next-line	::=	“N”
+//	Escaped Unicode next line (#x85) character.
+fragment NS_ESC_NEXT_LINE: 'N';
+
+//[56]	ns-esc-non-breaking-space	::=	“_”
+//	Escaped Unicode non-breaking space (#xA0) character.
+fragment NS_ESC_NON_BREAKING_SPACE: '_';
+
+//[57]	ns-esc-line-separator	::=	“L”
+//	Escaped Unicode line separator (#x2028) character.
+fragment NS_ESC_LINE_SEPARATOR: 'L';
+
+//[58]	ns-esc-paragraph-separator	::=	“P”
+//	Escaped Unicode paragraph separator (#x2029) character.
+fragment NS_ESC_PARAGRAPH_SEPARATOR: 'P';
+
+//[59]	ns-esc-8-bit	::=	“x” ( ns-hex-digit × 2 )
+//	Escaped 8-bit Unicode character.
+fragment NS_ESC_8_BIT: 'x' NS_HEX_DIGIT NS_HEX_DIGIT;
+
+//[60]	ns-esc-16-bit	::=	“u” ( ns-hex-digit × 4 )
+//	Escaped 16-bit Unicode character.
+fragment NS_ESC_16_BIT: 'u' NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT;
+
+//[61]	ns-esc-32-bit	::=	“U” ( ns-hex-digit × 8 )
+//	Escaped 32-bit Unicode character.
+fragment NS_ESC_32_BIT: 'U' NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT
+                            NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT NS_HEX_DIGIT;
+
+//[62] 	c-ns-esc-char 	::= 	“\”
+//                        ( ns-esc-null | ns-esc-bell | ns-esc-backspace
+//                        | ns-esc-horizontal-tab | ns-esc-line-feed
+//                        | ns-esc-vertical-tab | ns-esc-form-feed
+//                        | ns-esc-carriage-return | ns-esc-escape | ns-esc-space
+//                        | ns-esc-double-quote | ns-esc-slash | ns-esc-backslash
+//                        | ns-esc-next-line | ns-esc-non-breaking-space
+//                        | ns-esc-line-separator | ns-esc-paragraph-separator
+//                        | ns-esc-8-bit | ns-esc-16-bit | ns-esc-32-bit )
+fragment C_NS_ESC_CHAR: C_ESCAPE (
+    | NS_ESC_NULL                   | NS_ESC_BELL
+    | NS_ESC_BAKSPACE               | NS_ESC_HORIZONTAL_TAB
+    | NS_ESC_LINE_FEED              | NS_ESC_VERTICAL_TAB
+    | NS_ESC_FORM_FEED              | NS_ESC_CARRIAGE_RETURN
+    | NS_ESC_ESCAPE                 | NS_ESC_SPACE
+    | NS_ESC_DOUBLE_QUOTE           | NS_ESC_SLASH
+    | NS_ESC_BACKSLASH              | NS_ESC_NEXT_LINE
+    | NS_ESC_NON_BREAKING_SPACE     | NS_ESC_LINE_SEPARATOR
+    | NS_ESC_PARAGRAPH_SEPARATOR    | NS_ESC_8_BIT
+    | NS_ESC_16_BIT                 | NS_ESC_32_BIT
+);
+
+// TODO:  test escape characters once double quoted string is implemented
