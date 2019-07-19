@@ -81,3 +81,28 @@ B_BREAK: B_CARRIAGE_RETURN B_LINE_FEED |
 fragment S_SPACE: ' ';
 fragment S_TAB: '\t';
 S_WHITE: S_SPACE | S_TAB;
+
+//[35] 	ns-dec-digit 	::= 	[#x30-#x39] /* 0-9 */
+fragment NS_DEC_DIGIT: '0'..'9';
+
+//[36] 	ns-hex-digit 	::= 	  ns-dec-digit
+//                             | [#x41-#x46] /* A-F */ | [#x61-#x66] /* a-f */
+fragment NS_HEX_DIGIT: NS_DEC_DIGIT | 'A'..'F' | 'a'..'f';
+
+//[37] 	ns-ascii-letter 	::= 	[#x41-#x5A] /* A-Z */ | [#x61-#x7A] /* a-z */
+fragment NS_ASCII_LETTER: 'A'..'Z' | 'a'..'z';
+
+//[38] 	ns-word-char 	::= 	ns-dec-digit | ns-ascii-letter | “-”
+fragment NS_WORD_CHAR: NS_DEC_DIGIT | NS_ASCII_LETTER | '-';
+
+//[39] 	ns-uri-char 	::= 	  “%” ns-hex-digit ns-hex-digit | ns-word-char | “#”
+//                              | “;” | “/” | “?” | “:” | “@” | “&” | “=” | “+” | “$” | “,”
+//                              | “_” | “.” | “!” | “~” | “*” | “'” | “(” | “)” | “[” | “]”
+fragment NS_URI_CHAR:    '%' NS_HEX_DIGIT NS_HEX_DIGIT | NS_WORD_CHAR
+                       | '#' | ';' | '/' | '?' | ':' | '@' | '&' | '=' | '+' | '$'
+                       | ',' | '_' | '.' | '!' | '~' | '*' | '\''| '(' | ')' | '[' | ']';
+
+//[40] 	ns-tag-char 	::= 	ns-uri-char - “!” - c-flow-indicator
+fragment NS_TAG_CHAR:  '%' NS_HEX_DIGIT NS_HEX_DIGIT | NS_WORD_CHAR
+                     | '#' | ';' | '/' | '?' | ':' | '@' | '&' | '=' | '+'
+                     | '$' | '_' | '.' | '~' | '*' | '\''| '(' | ')' |;
