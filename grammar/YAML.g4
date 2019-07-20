@@ -4,9 +4,16 @@
 grammar YAML;
 // Comments starting with /// are copied from the YAML 1.2 reference https://yaml.org/spec/1.2/spec.htm.
 
+tokens {
+    INDENT,
+    DEDENT
+}
+
+//=============== Parser ===============
 yaml_stream: ;
 //document  : YAML_HEADER? bom_marker? WORD+;
 
+//=============== LEXER ===============
 fragment BOM_UTF32_BE: '\u0000' '\u0000' '\u00fe' '\u00ff';
 fragment BOM_UTF32_LE: '\u00ff' '\u00fe' '\u0000' '\u0000';
 fragment BOM_UTF16_BE: '\u00fe' '\u00ff';
@@ -81,7 +88,7 @@ B_BREAK: B_CARRIAGE_RETURN B_LINE_FEED |
 ///[33] 	s-white  ::= 	s-space | s-tab
 fragment S_SPACE: ' ';
 fragment S_TAB: '\t';
-S_WHITE: S_SPACE | S_TAB;
+fragment S_WHITE: S_SPACE | S_TAB;
 
 ///[35] 	ns-dec-digit 	::= 	[#x30-#x39] /* 0-9 */
 fragment NS_DEC_DIGIT: '0'..'9';
@@ -214,6 +221,39 @@ fragment C_NS_ESC_CHAR: C_ESCAPE (
     | NS_ESC_PARAGRAPH_SEPARATOR    | NS_ESC_8_BIT
     | NS_ESC_16_BIT                 | NS_ESC_32_BIT
 );
-
 // TODO:  test escape characters once double quoted string is implemented
 
+/// [63] 	s-indent(n) 	::= 	s-space × n
+/// [64] 	s-indent(<n) 	::= 	s-space × m /* Where m < n */
+/// [65] 	s-indent(≤n) 	::= 	s-space × m /* Where m ≤ n */
+S_INDENT: S_SPACE+;
+
+
+// TODO: work in progress to support some early testing
+///[126] 	ns-plain-first(c) 	::= 	  ( ns-char - c-indicator )
+///                                     | ( ( “?” | “:” | “-” )
+///                                        /* Followed by an ns-plain-safe(c)) */ )
+fragment NS_PLAIN_FIRST: NS_CHAR | (C_MAPPING_KEY | C_MAPPING_VALUE | C_SEQUENCE_ENTRY );
+
+///    /* Followed by an ns-plain-safe(c)) */ )
+///[127] 	ns-plain-safe(c) 	::= 	c = flow-out  ⇒ ns-plain-safe-out
+///                                     c = flow-in   ⇒ ns-plain-safe-in
+///                                     c = block-key ⇒ ns-plain-safe-out
+///                                     c = flow-key  ⇒ ns-plain-safe-in
+fragment NS_PLAIN_SAFE: NS_PLAIN_SAFE_IN;
+
+///[128] 	ns-plain-safe-out 	::= 	ns-char
+///[129] 	ns-plain-safe-in 	::= 	ns-char - c-flow-indicator
+fragment NS_PLAIN_SAFE_IN: NS_CHAR;
+///[130] 	ns-plain-char(c) 	::= 	  ( ns-plain-safe(c) - “:” - “#” )
+///                                    | ( /* An ns-char preceding */ “#” )
+///                                    | ( “:” /* Followed by an ns-plain-safe(c) */ )
+fragment NS_PLAIN_CHAR: NS_PLAIN_SAFE | C_COMMENT | C_MAPPING_VALUE NS_PLAIN_SAFE;
+///[131] 	ns-plain(n,c) 	::= 	c = flow-out  ⇒ ns-plain-multi-line(n,c)
+///                                c = flow-in   ⇒ ns-plain-multi-line(n,c)
+///                                c = block-key ⇒ ns-plain-one-line(c)
+///                                c = flow-key  ⇒ ns-plain-one-line(c)
+///[132] 	nb-ns-plain-in-line(c) 	::= 	( s-white* ns-plain-char(c) )*
+// TODO not following spec
+NB_NS_PLAIN_IN_LINE: (NS_PLAIN_CHAR)+;
+///[133]     	ns-plain-one-line(c) 	::= 	ns-plain-first(c) nb-ns-plain-in-line(c)

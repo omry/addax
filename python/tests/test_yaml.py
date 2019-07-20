@@ -2,23 +2,41 @@
 import pytest
 from antlr4 import *
 from antlr4.error.ErrorListener import ErrorListener
-from antelope import YAMLLexer
+from antelope import YAMLLexer, YAMLParser
 from antelope.yaml_input_stream import StringInputStream
+from antelope.yaml_lexer_wrapper import YAMLLexerWrapper
 
 
-def assert_token(token_or_tokens, expected_type_or_types):
-    if isinstance(token_or_tokens, list) and isinstance(expected_type_or_types, list):
-        for i in range(len(token_or_tokens)):
-            actual_type = token_or_tokens[i].type
-            expected_type = expected_type_or_types[i]
-            assert actual_type == expected_type, "Token #{}: Expected {}, matched {}".format(
-                i,
-                YAMLLexer.symbolicNames[expected_type],
-                YAMLLexer.symbolicNames[actual_type])
-    else:
-        assert token_or_tokens.type == expected_type_or_types, "Expected {}, matched {}".format(
-            YAMLLexer.symbolicNames[expected_type_or_types],
-            YAMLLexer.symbolicNames[token_or_tokens.type])
+def validate_token(token, expected_type):
+    assert token.type == expected_type, "Expected {}, matched {}".format(
+        YAMLLexer.symbolicNames[expected_type],
+        YAMLLexer.symbolicNames[token.type])
+
+
+def validate_token_list(tokens, expected_types):
+    def to_str(in_tokens):
+        s = ''
+        for t in in_tokens:
+            token_type = t if type(t) == int else t.type
+            if s == '':
+                s = 'YAMLParser.{}'.format(YAMLParser.symbolicNames[token_type])
+            else:
+                s += "," + 'YAMLParser.{}'.format(YAMLParser.symbolicNames[token_type])
+
+        return '[{}]'.format(s)
+
+    assert len(tokens) == len(expected_types), "mismatch number of tokens\nreceived=\n\t{}\nexpected=\n\t{}\n".format(
+        to_str(tokens),
+        to_str(expected_types),
+    )
+
+    for i in range(len(tokens)):
+        actual_type = tokens[i].type
+        expected_type = expected_types[i]
+        assert actual_type == expected_type, "Token #{}: Expected {}, matched {}".format(
+            i,
+            YAMLParser.symbolicNames[expected_type],
+            YAMLParser.symbolicNames[actual_type])
 
 
 @pytest.mark.parametrize('input_str', [
@@ -100,14 +118,14 @@ def test_lexer_illegal_bom(bom_str):
     lexer.addErrorListener(listener)
     tokens = lexer.getAllTokens()
 
-    assert_token(tokens, [YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END,
-                          YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END])
+    validate_token_list(tokens, [YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END,
+                                 YAMLLexer.C_SEQUENCE_START, YAMLLexer.C_SEQUENCE_END])
     assert len(listener.errors) == 1
     # error in column 2
     assert listener.errors[0] == 2
 
 
-@pytest.mark.parametrize('s, token', [
+@pytest.mark.parametrize('input_str, expected_tokens', [
     (b'\xef\xbb\xbf', YAMLLexer.BOM_MARKER),
     (b'\xfe\xff', YAMLLexer.BOM_MARKER),
     (b'\xff\xfe', YAMLLexer.BOM_MARKER),
@@ -135,12 +153,24 @@ def test_lexer_illegal_bom(bom_str):
     (b'\x0d\x0a', YAMLLexer.B_BREAK),
     (b'\x0d', YAMLLexer.B_BREAK),
     (b'\x0a', YAMLLexer.B_BREAK),
-    (b' ', YAMLLexer.S_WHITE),
-    (b'\t', YAMLLexer.S_WHITE),
+    (b' ', YAMLParser.INDENT),
+    (b"foo", [YAMLLexer.NB_NS_PLAIN_IN_LINE]),
+    (b"""foo:
+      bar
+    """, [YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.C_MAPPING_VALUE, YAMLParser.B_BREAK, YAMLParser.INDENT,
+          YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK, YAMLParser.DEDENT]),
+    (b"""foo:
+      bar
+      baz
+    """, [YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.C_MAPPING_VALUE, YAMLParser.B_BREAK, YAMLParser.INDENT,
+          YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK, YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK,
+          YAMLParser.DEDENT]),
+
 ])
-def test_tokens(s, token):
-    inp = StringInputStream(s)
-    lexer = YAMLLexer(inp)
+def test_tokens(input_str, expected_tokens):
+    if not isinstance(expected_tokens, list):
+        expected_tokens = [expected_tokens]
+    inp = StringInputStream(input_str)
+    lexer = YAMLLexerWrapper(inp)
     tokens = lexer.getAllTokens()
-    assert len(tokens) == 1
-    assert_token(tokens[0], token)
+    validate_token_list(tokens, expected_tokens)
