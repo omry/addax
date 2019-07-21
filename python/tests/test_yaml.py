@@ -210,6 +210,51 @@ def get_yeast_tests(directory):
 
 
 def tokens_to_yeast(tokens):
+    """
+    --  [@U@] BOM, contains \"@TF8@\", \"@TF16LE@\" or \"@TF16BE@\"
+    --  [@T@] Contains preserved content text characters
+    --  [@t@] Contains non-content (meta) text characters
+    --  [@b@] Contains separation line break
+    --  [@L@] Contains line break normalized to content line feed
+    --  [@l@] Contains line break folded to content space
+    --  [@I@] Contains character indicating structure
+    --  [@w@] Contains separation white space
+    --  [@i@] Contains indentation spaces
+    --  [@K@] Directives end marker
+    --  [@k@] Document end marker
+    --  [@E@] Begins escape sequence
+    --  [@e@] Ends escape sequence
+    --  [@C@] Begins comment
+    --  [@c@] Ends comment
+    --  [@D@] Begins directive
+    --  [@d@] Ends directive
+    --  [@G@] Begins tag
+    --  [@g@] Ends tag
+    --  [@H@] Begins tag handle
+    --  [@h@] Ends tag handle
+    --  [@A@] Begins anchor
+    --  [@a@] Ends anchor
+    --  [@P@] Begins node properties
+    --  [@p@] Ends node properties
+    --  [@R@] Begins alias (reference)
+    --  [@r@] Ends alias (reference)
+    --  [@S@] Begins scalar content
+    --  [@s@] Ends scalar content
+    --  [@Q@] Begins sequence content
+    --  [@q@] Ends sequence content
+    --  [@M@] Begins mapping content
+    --  [@m@] Ends mapping content
+    --  [@N@] Begins complete node
+    --  [@n@] Ends complete node
+    --  [@X@] Begins mapping key:value pair
+    --  [@x@] Ends mapping key:value pair
+    --  [@O@] Begins document
+    --  [@o@] Ends document
+    --  [@!@] Parsing error at this point.
+    --  [@-@] Unparsed text following error point.
+    :param tokens:
+    :return:
+    """
     res = []
     for t in tokens:
         s = ''
