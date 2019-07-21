@@ -1,2 +1,1 @@
-# B: 0, C: 0, L: 1, c: 0
-UTF-32BE
+../yaml-reference-tests/c-byte-order-mark.utf32be.output

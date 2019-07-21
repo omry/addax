@@ -205,7 +205,7 @@ def get_my_yeast_tests():
 def get_yeast_tests(directory):
     tests_dir = path.join(path.dirname(__file__), directory)
     assert path.exists(tests_dir)
-    tests = [(tests_dir, path.splitext(path.basename(x))[0]) for x in glob.glob(tests_dir + '/*.input')]
+    tests = [(tests_dir, path.splitext(path.basename(x))[0]) for x in sorted(glob.glob(tests_dir + '/*.input'))]
     return tests
 
 
@@ -255,6 +255,10 @@ def tokens_to_yeast(tokens):
     :param tokens:
     :return:
     """
+
+    def hex_str(text, prefix=''):
+        return [prefix + hex(ord(c))[2:].zfill(2) for c in text]
+
     res = []
     for t in tokens:
         s = ''
@@ -270,7 +274,9 @@ def tokens_to_yeast(tokens):
             elif t.text == u'\xef\xbb\xbf':
                 s = "UTF-8"
             else:
-                assert False, "Invalid bom data : {}".format([hex(ord(c)) for c in t.text])
+                assert False, "Invalid bom data : {}".format(hex_str(t.text))
+        elif t.type == YAMLLexer.B_BREAK:
+            s = '-' + (''.join(hex_str(t.text, '\\x')))
 
         res.append(s)
 
