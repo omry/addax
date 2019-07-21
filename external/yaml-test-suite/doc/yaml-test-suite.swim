@@ -1,0 +1,66 @@
+YAML Test Suite
+===============
+
+Comprehensive Test Suite for YAML
+
+= Overview
+
+This test suite is composed of (what will eventually be) 100s of test
+directories that each represent a specific situation for a YAML processor. Each
+test directory contains a number of related files, that test suites can be made
+to use in interesting ways. For example:
+
+* Metadata about the test
+  * Name (short phrase)
+  * Tags
+  * Description
+* Input YAML
+* Canonical Output YAML
+* Matching JSON
+* Token stream notation
+* Event stream notation
+* Error data
+* etc
+
+Not every test dir will have the same elements. Since the tests are just data,
+it is up to the framework using the tests to decide which tests to use and how
+to use them.
+
+The tests are currently written in TestML under the `test` directory on the
+`master` branch. The test data is split into the separate files structure, and
+kept on the `data` branch. This makes tests easier to groom.
+
+To get a quick overview of the tests you can have a look at the "YAML Test
+Matrix"[http://matrix.yaml.io/]
+- [https://github.com/perlpunk/yaml-test-matrix].
+
+== Updating Things
+
+When test files change you need to update various artifacts. To do this, run
+the following commands:
+
+```
+make update         # Updates tags and name artifacts
+make data-update    # Updates the data branch (under ./data/)
+```
+
+You will need Bash, NodeJS and Perl for these things.
+
+= Libaries using this test suite
+
+* C
+  * "libyaml"[https://github.com/yaml/libyaml]
+* C#
+  * "YamlDotNet"[https://github.com/aaubry/YamlDotNet]
+* D
+  * "dyaml"[https://github.com/dlang-community/D-YAML]
+* Haskell
+  * "HsYAML"[https://github.com/haskell-hvr/HsYAML]
+* Javascript
+  * "yaml"[https://github.com/eemeli/yaml]
+* Nim
+  * "NimYAML"[https://github.com/flyx/NimYAML]
+* Perl 5
+  * "YAML::PP"[https://github.com/perlpunk/YAML-PP-p5]
+
+If your library is using the test suite, drop us a line and we can add it here.
