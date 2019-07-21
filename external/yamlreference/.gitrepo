@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/orenbenkiki/yamlreference.git
+	branch = master
+	commit = bf471f804ccd014fcdded3a8c74c338df8f33c85
+	parent = 605ec669c8ed96e843802d3cd8fc45e847e0ad6f
+	method = merge
+	cmdver = 0.4.0
