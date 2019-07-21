@@ -192,3 +192,72 @@ def test_lexer_data_dir(test_dir, test_name):
             expected_tokens.append(t)
 
     test_tokens(test_input, expected_tokens)
+
+
+def get_reference_yeast_tests():
+    return get_yeast_tests('yaml-reference-tests')
+
+
+def get_my_yeast_tests():
+    return get_yeast_tests('supported-yaml-reference-tests')
+
+
+def get_yeast_tests(directory):
+    tests_dir = path.join(path.dirname(__file__), directory)
+    assert path.exists(tests_dir)
+    tests = [(tests_dir, path.splitext(path.basename(x))[0]) for x in glob.glob(tests_dir + '/*.input')]
+    return tests
+
+
+def tokens_to_yeast(tokens):
+    res = []
+    for t in tokens:
+        s = ''
+        if t.type == YAMLLexer.BOM_MARKER:
+            if t.text == u'\x00\x00\xfe\xff':
+                s = "UTF-32BE"
+            elif t.text == u'\xff\xfe\x00\x00':
+                s = "UTF-32LE"
+            elif t.text == u'\xfe\xff':
+                s = "UTF-16BE"
+            elif t.text == u'\xff\xfe':
+                s = "UTF-16LE"
+            elif t.text == u'\xef\xbb\xbf':
+                s = "UTF-8"
+            else:
+                assert False, "Invalid bom data : {}".format([hex(ord(c)) for c in t.text])
+
+        res.append(s)
+
+    return res
+
+
+@pytest.mark.parametrize('test_dir, test_name', get_my_yeast_tests())
+def test_lexer_data_dir(test_dir, test_name):
+    yeast_test_impl(test_dir, test_name)
+
+
+# TODO: enable later
+# @pytest.mark.parametrize('test_dir, test_name', get_reference_yeast_tests())
+# def test_lexer_data_dir(test_dir, test_name):
+#     yeast_test_impl(test_dir, test_name)
+
+
+def yeast_test_impl(test_dir, test_name):
+    with open(path.join(test_dir, test_name + '.input'), mode='rb') as file:  # b is important -> binary
+        test_input = file.read()
+    with open(path.join(test_dir, test_name + '.output'), 'r') as f:
+        expected_yeast_tokens = []
+        for t in f.readlines():
+            t = t.strip('\n\r')
+            if t.startswith("#"):
+                continue
+            expected_yeast_tokens.append(t)
+
+    inp = StringInputStream(test_input)
+    lexer = YAMLLexerWrapper(inp)
+    produced_tokens = lexer.getAllTokens()
+    produced_yeast_tokens = tokens_to_yeast(produced_tokens)
+    for idx in range(min(len(expected_yeast_tokens), len(produced_yeast_tokens))):
+        assert produced_yeast_tokens[idx] == expected_yeast_tokens[idx]
+    assert len(expected_yeast_tokens) == len(produced_yeast_tokens)

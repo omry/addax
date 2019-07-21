@@ -1,5 +1,5 @@
 import six
-import utils
+from . import utils
 
 from antlr4.Token import Token
 

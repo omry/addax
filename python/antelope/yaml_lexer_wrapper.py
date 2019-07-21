@@ -2,10 +2,12 @@ from . import YAMLLexer
 from . import YAMLParser
 from antlr4.Token import Token, CommonToken
 
+
 class YAMLLexerWrapper(YAMLLexer):
     """
     A wrapper of the lexer that handles the the indentation logic.
     """
+
     def __init__(self, input_stream):
         super(YAMLLexerWrapper, self).__init__(input_stream)
         self.last_token = None
