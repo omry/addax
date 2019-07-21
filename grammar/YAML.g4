@@ -229,6 +229,9 @@ fragment C_NS_ESC_CHAR: C_ESCAPE (
 S_INDENT: S_SPACE+;
 
 
+//[66] 	s-separate-in-line 	::= 	s-white+ | /* Start of line *//
+fragment S_SEPARATE_IN_LINE: S_WHITE+;
+
 // TODO: work in progress to support some early testing
 ///[126] 	ns-plain-first(c) 	::= 	  ( ns-char - c-indicator )
 ///                                     | ( ( “?” | “:” | “-” )
