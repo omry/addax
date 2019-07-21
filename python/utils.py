@@ -48,7 +48,7 @@ def get_bom_from_string(input_str, input_encoding=None):
         elif len(sig) >= 2 and sig[0] == xfe and sig[1] == xff:
             encoding = 'utf-16-be'
             bom = sig[0:2]
-        elif sig[0] == x00:
+        elif len(sig) > 2 and sig[0] == x00:
             encoding = 'utf-16-be'
         elif len(sig) >= 2 and sig[0] == xff and sig[1] == xfe:
             encoding = 'utf-16-le'

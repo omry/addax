@@ -5,6 +5,9 @@ from antlr4.error.ErrorListener import ErrorListener
 from antelope import YAMLLexer, YAMLParser
 from antelope.yaml_input_stream import StringInputStream
 from antelope.yaml_lexer_wrapper import YAMLLexerWrapper
+import os
+from os import path
+import glob
 
 
 def validate_token(token, expected_type):
@@ -153,19 +156,6 @@ def test_lexer_illegal_bom(bom_str):
     (b'\x0d\x0a', YAMLLexer.B_BREAK),
     (b'\x0d', YAMLLexer.B_BREAK),
     (b'\x0a', YAMLLexer.B_BREAK),
-    (b' ', YAMLParser.INDENT),
-    (b"foo", [YAMLLexer.NB_NS_PLAIN_IN_LINE]),
-    (b"""foo:
-      bar
-    """, [YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.C_MAPPING_VALUE, YAMLParser.B_BREAK, YAMLParser.INDENT,
-          YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK, YAMLParser.DEDENT]),
-    (b"""foo:
-      bar
-      baz
-    """, [YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.C_MAPPING_VALUE, YAMLParser.B_BREAK, YAMLParser.INDENT,
-          YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK, YAMLParser.NB_NS_PLAIN_IN_LINE, YAMLParser.B_BREAK,
-          YAMLParser.DEDENT]),
-
 ])
 def test_tokens(input_str, expected_tokens):
     if not isinstance(expected_tokens, list):
@@ -174,3 +164,31 @@ def test_tokens(input_str, expected_tokens):
     lexer = YAMLLexerWrapper(inp)
     tokens = lexer.getAllTokens()
     validate_token_list(tokens, expected_tokens)
+
+
+def get_lexer_tests():
+    tests_dir = path.join(path.dirname(__file__), 'lexer_tests_data')
+    assert path.exists(tests_dir)
+    tests = [(tests_dir, path.splitext(path.basename(x))[0]) for x in glob.glob(tests_dir + '/*.meta')]
+    return tests
+
+
+@pytest.mark.parametrize('test_dir, test_name', get_lexer_tests())
+def test_lexer_data_dir(test_dir, test_name):
+    with open(path.join(test_dir, test_name + '.in'), mode='rb') as file:  # b is important -> binary
+        test_input = file.read()
+    with open(path.join(test_dir, test_name + '.tokens'), 'r') as f:
+        expected_tokens = []
+        for t in f.readlines():
+            t = t.strip('\n')
+            try:
+                t = getattr(YAMLLexer, t)
+            except AttributeError:
+                try:
+                    t = getattr(YAMLParser, t)
+                except AttributeError:
+                    raise RuntimeError("{} was not found in both YAMLLexer and YAMLParser".format(t))
+
+            expected_tokens.append(t)
+
+    test_tokens(test_input, expected_tokens)
