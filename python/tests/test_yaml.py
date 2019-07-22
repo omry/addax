@@ -22,11 +22,11 @@ def validate_token_list(tokens, expected_types):
         for t in in_tokens:
             token_type = t if type(t) == int else t.type
             if s == '':
-                s = 'YAMLParser.{}'.format(YAMLParser.symbolicNames[token_type])
+                s = '{}'.format(YAMLParser.symbolicNames[token_type])
             else:
-                s += "," + 'YAMLParser.{}'.format(YAMLParser.symbolicNames[token_type])
+                s += '\n\t' + '{}'.format(YAMLParser.symbolicNames[token_type])
 
-        return '[{}]'.format(s)
+        return '{}'.format(s)
 
     assert len(tokens) == len(expected_types), "mismatch number of tokens\nreceived=\n\t{}\nexpected=\n\t{}\n".format(
         to_str(tokens),
@@ -153,9 +153,9 @@ def test_lexer_illegal_bom(bom_str):
     (b'%', YAMLLexer.C_DIRECTIVE),
     (b'@', YAMLLexer.C_RESERVED),
     (b'`', YAMLLexer.C_RESERVED),
-    (b'\x0d\x0a', YAMLLexer.B_BREAK),
-    (b'\x0d', YAMLLexer.B_BREAK),
-    (b'\x0a', YAMLLexer.B_BREAK),
+    (b'\x0d\x0a', [YAMLLexer.B_BREAK]),
+    (b'\x0d', [YAMLLexer.B_BREAK]),
+    (b'\x0a', [YAMLLexer.B_BREAK]),
 ])
 def test_tokens(input_str, expected_tokens):
     if not isinstance(expected_tokens, list):
@@ -282,33 +282,33 @@ def tokens_to_yeast(tokens):
 
     return res
 
-
-@pytest.mark.parametrize('test_dir, test_name', get_my_yeast_tests())
-def test_lexer_data_dir(test_dir, test_name):
-    yeast_test_impl(test_dir, test_name)
-
+#
+# @pytest.mark.parametrize('test_dir, test_name', get_my_yeast_tests())
+# def test_lexer_data_dir(test_dir, test_name):
+#     yeast_test_impl(test_dir, test_name)
+#
 
 # TODO: enable later
 # @pytest.mark.parametrize('test_dir, test_name', get_reference_yeast_tests())
 # def test_lexer_data_dir(test_dir, test_name):
 #     yeast_test_impl(test_dir, test_name)
 
-
-def yeast_test_impl(test_dir, test_name):
-    with open(path.join(test_dir, test_name + '.input'), mode='rb') as file:  # b is important -> binary
-        test_input = file.read()
-    with open(path.join(test_dir, test_name + '.output'), 'r') as f:
-        expected_yeast_tokens = []
-        for t in f.readlines():
-            t = t.strip('\n\r')
-            if t.startswith("#"):
-                continue
-            expected_yeast_tokens.append(t)
-
-    inp = StringInputStream(test_input)
-    lexer = YAMLLexerWrapper(inp)
-    produced_tokens = lexer.getAllTokens()
-    produced_yeast_tokens = tokens_to_yeast(produced_tokens)
-    for idx in range(min(len(expected_yeast_tokens), len(produced_yeast_tokens))):
-        assert produced_yeast_tokens[idx] == expected_yeast_tokens[idx]
-    assert len(expected_yeast_tokens) == len(produced_yeast_tokens)
+#
+# def yeast_test_impl(test_dir, test_name):
+#     with open(path.join(test_dir, test_name + '.input'), mode='rb') as file:  # b is important -> binary
+#         test_input = file.read()
+#     with open(path.join(test_dir, test_name + '.output'), 'r') as f:
+#         expected_yeast_tokens = []
+#         for t in f.readlines():
+#             t = t.strip('\n\r')
+#             if t.startswith("#"):
+#                 continue
+#             expected_yeast_tokens.append(t)
+#
+#     inp = StringInputStream(test_input)
+#     lexer = YAMLLexerWrapper(inp)
+#     produced_tokens = lexer.getAllTokens()
+#     produced_yeast_tokens = tokens_to_yeast(produced_tokens)
+#     for idx in range(min(len(expected_yeast_tokens), len(produced_yeast_tokens))):
+#         assert produced_yeast_tokens[idx] == expected_yeast_tokens[idx]
+#     assert len(expected_yeast_tokens) == len(produced_yeast_tokens)
